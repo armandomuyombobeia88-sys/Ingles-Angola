@@ -3,64 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola AI Teacher Pro</title>
+    <title>Angola English Pro</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; }
-        .header { background: #202c33; padding: 15px; border-bottom: 1px solid #333; text-align: center; }
-        .voice-row { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
-        .v-btn { background: #333; border: 1px solid #00a884; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; }
-        .v-btn.active { background: #00a884; font-weight: bold; }
+        :root { --whatsapp-dark: #0b141a; --bot-bubble: #202c33; --user-bubble: #005c4b; --accent: #f8d800; --angola-red: #d81e05; }
+        body { font-family: -apple-system, sans-serif; background: var(--whatsapp-dark); margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; overflow: hidden; }
         
-        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 90px; }
-        .m { max-width: 85%; padding: 12px; border-radius: 15px; line-height: 1.4; animation: fadeIn 0.2s; }
-        .bot { background: #202c33; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .user { background: #005c4b; align-self: flex-end; border-bottom-right-radius: 2px; }
-        
-        .input-area { position: fixed; bottom: 0; width: 100%; background: #202c33; padding: 10px; display: flex; gap: 8px; box-sizing: border-box; }
-        input { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; font-size: 16px; outline: none; }
-        button { background: #00a884; border: none; width: 45px; height: 45px; border-radius: 50%; color: white; font-weight: bold; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* Stats Bar */
+        .stats-bar { background: #202c33; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; font-size: 0.8rem; }
+        .xp-pill { background: var(--angola-red); padding: 4px 10px; border-radius: 10px; font-weight: bold; }
+
+        .header { background: #202c33; padding: 10px; text-align: center; border-bottom: 1px solid #444; }
+        .v-row { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+        .v-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 15px; font-size: 0.7rem; }
+        .v-btn.active { background: var(--accent); color: black; }
+
+        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 100px; }
+        .m { max-width: 85%; padding: 12px; border-radius: 15px; line-height: 1.4; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .bot { background: var(--bot-bubble); align-self: flex-start; border-top-left-radius: 2px; border-left: 4px solid var(--angola-red); }
+        .user { background: var(--user-bubble); align-self: flex-end; border-top-right-radius: 2px; }
+
+        .input-area { position: fixed; bottom: 0; width: 100%; background: #202c33; padding: 15px; display: flex; gap: 10px; box-sizing: border-box; }
+        input { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 30px; color: white; font-size: 16px; outline: none; }
+        .send-btn { background: var(--accent); border: none; width: 50px; height: 50px; border-radius: 50%; color: black; font-weight: bold; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
+<div class="stats-bar">
+    <span>Lvl 1 Teacher 👨‍🏫</span>
+    <span class="xp-pill" id="xp-tag">0 XP</span>
+</div>
+
 <div class="header">
-    <div style="font-weight: bold; color: #00a884;">ENGLISH TEACHER AI 🇦🇴</div>
-    <div class="voice-row">
-        <div class="v-btn active" id="btn-us" onclick="setV('en-US')">🇺🇸 USA</div>
-        <div class="v-btn" id="btn-uk" onclick="setV('en-GB')">🇬🇧 UK</div>
+    <div style="font-weight: bold;">ANGOLA AI BOT 🇦🇴</div>
+    <div class="v-row">
+        <div class="v-btn active" id="us" onclick="setV('en-US','us')">🇺🇸 USA</div>
+        <div class="v-btn" id="uk" onclick="setV('en-GB','uk')">🇬🇧 UK</div>
     </div>
 </div>
 
 <div id="chat-box">
-    <div class="m bot">Ready for class, brother! Type in Portuguese or English (Try: Hello, Good morning, or Fome).</div>
+    <div class="m bot"><b>Mambo, brother!</b> I'm your private English coach. Type anything or ask for the <b>"Daily Word"</b>.</div>
 </div>
 
 <div class="input-area">
-    <input type="text" id="in" placeholder="Chat with me..." onkeypress="if(event.key==='Enter') send()">
-    <button onclick="send()">></button>
+    <input type="text" id="in" placeholder="Talk to me..." onkeypress="if(event.key==='Enter') send()">
+    <button class="send-btn" onclick="send()">></button>
 </div>
 
 <script>
     let currentVoice = 'en-US';
+    let xp = 0;
 
-    // THIS IS YOUR BRAIN - Add as many as you want!
-    const dictionary = [
-        { pt: "bom dia", en: "Good morning!", note: "Use until 12:00 PM." },
-        { pt: "hello", en: "Hello! How can I help you?", note: "Standard greeting." },
-        { pt: "hi", en: "Hi there! What's up?", note: "Informal greeting." },
-        { pt: "como estas", en: "How are you?", note: "Response: I am fine, thank you!" },
-        { pt: "how are you", en: "I am doing great, and you?", note: "Ask back: And you?" },
-        { pt: "obrigado", en: "Thank you!", note: "Polite way to say thanks." },
-        { pt: "fome", en: "I am hungry", note: "Time to eat some funge!" },
-        { pt: "estamos juntos", en: "We are together!", note: "The Angolan way! 🇦🇴" },
-        { pt: "ajuda", en: "Can you help me?", note: "Asking for assistance." }
+    const brain = [
+        { pt: "bom dia", en: "Good morning", tip: "Use this before 12 PM." },
+        { pt: "tudo bem", en: "How is it going?", tip: "Casual way to say hi." },
+        { pt: "obrigado", en: "Thank you very much", tip: "Always be polite!" },
+        { pt: "estamos juntos", en: "We are together", tip: "The spirit of Angola!" },
+        { pt: "daily word", en: "Resilience", tip: "Means: Never giving up (Exactly like you!)" },
+        { pt: "hello", en: "Hello! Ready to learn?", tip: "Answer: Yes, I am!" },
+        { pt: "how are you", en: "I am doing great!", tip: "Always stay positive." }
     ];
 
-    function setV(v) {
+    function setV(v, id) {
         currentVoice = v;
-        document.getElementById('btn-us').className = v === 'en-US' ? 'v-btn active' : 'v-btn';
-        document.getElementById('btn-uk').className = v === 'en-GB' ? 'v-btn active' : 'v-btn';
+        document.querySelectorAll('.v-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
     }
 
     function send() {
@@ -73,23 +81,29 @@
 
         setTimeout(() => {
             let msg = val.toLowerCase();
-            // This line finds the word even if it's inside a longer sentence!
-            let found = dictionary.find(d => msg.includes(d.pt) || msg.includes(d.en.toLowerCase()));
+            let found = brain.find(d => msg.includes(d.pt) || msg.includes(d.en.toLowerCase()));
 
             if(found) {
-                let response = "🇺🇸 " + found.en + "\n\n💡 " + found.note;
+                let response = `🇺🇸 <b>${found.en}</b><br><br>💡 ${found.tip}`;
                 addMsg(response, 'bot');
                 speak(found.en);
+                updateXP(10);
             } else {
-                addMsg("I haven't learned that one yet, brother! Tell me on WhatsApp and I will learn it tonight. Try 'Hello' or 'Bom dia'.", 'bot');
+                addMsg("I'm still learning that one, bro! Try 'Daily Word' or 'Estamos juntos'.", 'bot');
             }
-        }, 500);
+        }, 600);
+    }
+
+    function updateXP(amount) {
+        xp += amount;
+        document.getElementById('xp-tag').innerText = xp + " XP";
+        if(xp % 50 === 0) alert("🔥 Level Up! You're crushing it!");
     }
 
     function addMsg(t, s) {
         let d = document.createElement('div');
         d.className = 'm ' + s;
-        d.innerText = t;
+        d.innerHTML = t;
         let box = document.getElementById('chat-box');
         box.appendChild(d);
         box.scrollTop = box.scrollHeight;
@@ -98,7 +112,7 @@
     function speak(t) {
         let s = new SpeechSynthesisUtterance(t);
         s.lang = currentVoice;
-        s.rate = 0.85; // Natural speed
+        s.rate = 0.85;
         window.speechSynthesis.speak(s);
     }
 </script>
