@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inglês Angola</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .app-container { width: 90%; max-width: 400px; text-align: center; }
+        .card { background: #1c1c1e; padding: 40px 20px; border-radius: 30px; border: 2px solid #d81e05; box-shadow: 0 0 20px rgba(216, 30, 5, 0.3); margin-bottom: 30px; min-height: 200px; display: flex; flex-direction: column; justify-content: center; }
+        .pt { color: #8e8e93; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .en { color: #ffffff; font-size: 2.5rem; font-weight: 800; }
+        button { background: #f8d800; color: #000; border: none; padding: 20px; border-radius: 15px; font-size: 1.2rem; font-weight: bold; width: 100%; margin-top: 10px; transition: transform 0.1s; }
+        button:active { transform: scale(0.95); }
+        .audio-btn { background: #007aff; color: white; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="card">
+        <div class="pt" id="pt-display">Bom dia</div>
+        <div class="en" id="en-display">Good morning</div>
+    </div>
+    
+    <button class="audio-btn" onclick="speak()">Ouvir Pronúncia 🔊</button>
+    <button onclick="nextWord()">Próxima Palavra 🇦🇴</button>
+</div>
+
+<script>
+    const vocabulary = [
+        {pt: "Bom dia", en: "Good morning"},
+        {pt: "Como estás?", en: "How are you?"},
+        {pt: "Estamos juntos", en: "We are together"},
+        {pt: "Obrigado", en: "Thank you"},
+        {pt: "Faz favor", en: "Please"},
+        {pt: "Até logo", en: "See you later"}
+    ];
+    let currentIndex = 0;
+
+    function nextWord() {
+        currentIndex = (currentIndex + 1) % vocabulary.length;
+        document.getElementById('pt-display').innerText = vocabulary[currentIndex].pt;
+        document.getElementById('en-display').innerText = vocabulary[currentIndex].en;
+    }
+
+    function speak() {
+        const text = vocabulary[currentIndex].en;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+    }
+</script>
+
+</body>
+</html>
