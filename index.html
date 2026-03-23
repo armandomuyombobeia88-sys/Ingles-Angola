@@ -1,77 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Angola English Teacher Pro</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; }
+        .header { background: #202c33; padding: 10px 15px; border-bottom: 1px solid #333; }
+        .voice-selector { display: flex; gap: 5px; margin-top: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .v-btn { background: #333; border: 1px solid #555; color: #ccc; font-size: 0.7rem; padding: 5px 10px; border-radius: 15px; white-space: nowrap; }
+        .v-btn.active { background: #00a884; color: white; border-color: #00a884; }
         
-        /* Message Bubbles */
-        .msg { max-width: 80%; padding: 12px; border-radius: 15px; font-size: 1rem; line-height: 1.4; }
-        .bot { background: #202c33; color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .user { background: #005c4b; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .m { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; animation: fadeIn 0.3s; }
+        .bot { background: #202c33; align-self: flex-start; border-top-left-radius: 0; }
+        .user { background: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
+        
+        .input-area { background: #202c33; padding: 10px; display: flex; gap: 8px; }
+        input { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 24px; color: white; outline: none; }
+        button.send { background: #00a884; border: none; width: 45px; height: 45px; border-radius: 50%; color: white; font-weight: bold; }
 
-        /* Input Area */
-        .input-area { background: #202c33; padding: 10px; display: flex; gap: 10px; align-items: center; }
-        input { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 20px; color: white; outline: none; }
-        button { background: #00a884; border: none; color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
-        
-        .header { background: #202c33; color: #00a884; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #333; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .speaking { border: 2px solid #00a884; box-shadow: 0 0 10px #00a884; }
     </style>
 </head>
 <body>
 
-<div class="header">Angola English AI 🇦🇴</div>
-<div id="chat-window">
-    <div class="msg bot">Olá! Eu sou o teu Chatbot de Inglês. Escreve qualquer coisa em Português e eu ensino-te como se diz em Inglês!</div>
+<div class="header">
+    <div style="font-weight: bold; color: #00a884;">Professor AI 🇦🇴</div>
+    <div class="voice-selector">
+        <div class="v-btn active" onclick="setVoice('us-f', this)">🇺🇸 USA (F)</div>
+        <div class="v-btn" onclick="setVoice('us-m', this)">🇺🇸 USA (M)</div>
+        <div class="v-btn" onclick="setVoice('uk', this)">🇬🇧 UK</div>
+    </div>
+</div>
+
+<div id="chat-box">
+    <div class="m bot" id="welcome">Olá, brother! Escolhe o sotaque acima e escreve uma frase.</div>
 </div>
 
 <div class="input-area">
-    <input type="text" id="userInput" placeholder="Escreve aqui...">
-    <button onclick="sendMessage()">Enviar</button>
+    <input type="text" id="in" placeholder="Escreve aqui..." onkeypress="if(event.key==='Enter') send()">
+    <button class="send" onclick="send()">></button>
 </div>
 
 <script>
-    // Simple "Brain" for the bot
-    const dictionary = {
-        "oi": "Hi! In English we say: 'Hello' or 'Hi'.",
-        "tudo bem": "You can say: 'How are you?' or 'I am fine'.",
-        "como estas": "In English: 'How are you doing?'",
-        "obrigado": "That is: 'Thank you!'",
-        "mambo": "A 'mambo' can be a 'thing' or 'business' in English.",
-        "fome": "Say: 'I am hungry'.",
-        "estamos juntos": "We say: 'We are together' or 'I got your back!'"
+    let selectedVoice = 'en-US'; 
+    let selectedRate = 0.9; // Slightly slower for better learning
+
+    const brain = {
+        "bom dia": "Good morning!",
+        "como estas": "How are you doing today?",
+        "obrigado": "Thank you very much!",
+        "estamos juntos": "We are together, my friend!",
+        "fome": "I am starving!",
+        "ajuda": "Can you help me, please?",
+        "parabens": "Congratulations! Great job!",
+        "boa tarde": "Good afternoon!",
+        "onde ficas": "Where is it located?"
     };
 
-    function sendMessage() {
-        const input = document.getElementById('userInput');
-        const text = input.value.toLowerCase().trim();
-        if (text === "") return;
-
-        addMessage(input.value, 'user');
-        input.value = "";
-
-        // Bot "Thinking" delay
-        setTimeout(() => {
-            let reply = "Desculpa, ainda estou a aprender essa! Tenta 'Oi' ou 'Obrigado'.";
-            
-            // Check dictionary
-            for (let key in dictionary) {
-                if (text.includes(key)) {
-                    reply = dictionary[key];
-                }
-            }
-            addMessage(reply, 'bot');
-        }, 600);
+    function setVoice(type, el) {
+        document.querySelectorAll('.v-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        if(type === 'us-f') selectedVoice = 'en-US';
+        if(type === 'us-m') selectedVoice = 'en-US'; // iPhone handles Male/Female automatically via system settings
+        if(type === 'uk') selectedVoice = 'en-GB';
     }
 
-    function addMessage(text, sender) {
-        const div = document.createElement('div');
-        div.className = `msg ${sender}`;
-        div.innerText = text;
-        const window = document.getElementById('chat-window');
-        window.appendChild(div);
-        window.scrollTop = window.scrollHeight;
+    function send() {
+        let input = document.getElementById('in');
+        let text = input.value.trim();
+        if(!text) return;
+
+        addMsg(text, 'user');
+        input.value = "";
+
+        setTimeout(() => {
+            let reply = "Ainda não aprendi essa, brother! Tenta 'Bom dia' ou 'Como estas'.";
+            let lowerText = text.toLowerCase();
+
+            for (let key in brain) {
+                if (lowerText.includes(key)) {
+                    reply = brain[key];
+                    break;
+                }
+            }
+            
+            let bubble = addMsg(reply, 'bot');
+            
+            // SPEAK LOGIC
+            if(reply.includes('!')) {
+                bubble.classList.add('speaking');
+                let speech = new SpeechSynthesisUtterance(reply);
+                speech.lang = selectedVoice;
+                speech.rate = selectedRate;
+                
+                // On iPhone, if you want Male/Female specifically, 
+                // it usually picks based on the user's Siri voice settings.
+                
+                speech.onend = () => bubble.classList.remove('speaking');
+                window.speechSynthesis.speak(speech);
+            }
+        }, 500);
+    }
+
+    function addMsg(t, s) {
+        let b = document.createElement('div');
+        b.className = 'm ' + s;
+        b.innerText = t;
+        let box = document.getElementById('chat-box');
+        box.appendChild(b);
+        box.scrollTop = box.scrollHeight;
+        return b;
     }
 </script>
 
