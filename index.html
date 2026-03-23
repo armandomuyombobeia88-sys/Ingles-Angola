@@ -3,54 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inglês Angola</title>
+    <title>English Ai Boy 🇦🇴</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .app-container { width: 90%; max-width: 400px; text-align: center; }
-        .card { background: #1c1c1e; padding: 40px 20px; border-radius: 30px; border: 2px solid #d81e05; box-shadow: 0 0 20px rgba(216, 30, 5, 0.3); margin-bottom: 30px; min-height: 200px; display: flex; flex-direction: column; justify-content: center; }
-        .pt { color: #8e8e93; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-        .en { color: #ffffff; font-size: 2.5rem; font-weight: 800; }
-        button { background: #f8d800; color: #000; border: none; padding: 20px; border-radius: 15px; font-size: 1.2rem; font-weight: bold; width: 100%; margin-top: 10px; transition: transform 0.1s; }
-        button:active { transform: scale(0.95); }
-        .audio-btn { background: #007aff; color: white; margin-top: 20px; }
+        body { font-family: -apple-system, sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .app { width: 90%; max-width: 400px; text-align: center; }
+        
+        /* The AI Boy Area */
+        .ai-boy { font-size: 5rem; margin-bottom: 10px; transition: 0.3s; display: inline-block; }
+        .bounce { transform: translateY(-20px) scale(1.1); }
+        
+        .stats { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: #f8d800; }
+        
+        .card { background: #1c1c1e; padding: 30px 20px; border-radius: 25px; border-bottom: 5px solid #d81e05; margin-bottom: 20px; }
+        .pt { color: #8e8e93; font-size: 1rem; margin-bottom: 5px; }
+        .en { color: #fff; font-size: 2.2rem; font-weight: 800; }
+        
+        button { background: #f8d800; color: #000; border: none; padding: 18px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; width: 100%; margin-bottom: 10px; box-shadow: 0 4px #b39b00; }
+        button:active { box-shadow: none; transform: translateY(4px); }
+        .audio-btn { background: #007aff; color: white; box-shadow: 0 4px #004da1; }
+        
+        .progress-container { background: #333; height: 10px; border-radius: 5px; margin-top: 20px; overflow: hidden; }
+        .progress-bar { background: #d81e05; height: 100%; width: 0%; transition: 0.5s; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app">
+    <div id="boy" class="ai-boy">🤖</div>
+    
+    <div class="stats">
+        <span>Nível 1</span>
+        <span id="xp">XP: 0</span>
+    </div>
+
     <div class="card">
-        <div class="pt" id="pt-display">Bom dia</div>
-        <div class="en" id="en-display">Good morning</div>
+        <div class="pt" id="pt">Como se diz...</div>
+        <div id="en" class="en">Bom dia</div>
     </div>
     
     <button class="audio-btn" onclick="speak()">Ouvir Pronúncia 🔊</button>
-    <button onclick="nextWord()">Próxima Palavra 🇦🇴</button>
+    <button onclick="next()">Acertou! Próxima (+10 XP) 🚀</button>
+
+    <div class="progress-container">
+        <div id="bar" class="progress-bar"></div>
+    </div>
 </div>
 
 <script>
-    const vocabulary = [
+    const vocab = [
         {pt: "Bom dia", en: "Good morning"},
-        {pt: "Como estás?", en: "How are you?"},
-        {pt: "Estamos juntos", en: "We are together"},
-        {pt: "Obrigado", en: "Thank you"},
+        {pt: "Tudo bem?", en: "How are you?"},
         {pt: "Faz favor", en: "Please"},
-        {pt: "Até logo", en: "See you later"}
+        {pt: "Obrigado", en: "Thank you"},
+        {pt: "Estamos juntos", en: "We are together"},
+        {pt: "Tenho uma mambo para ti", en: "I have something for you"},
+        {pt: "Até amanhã", en: "See you tomorrow"}
     ];
-    let currentIndex = 0;
+    
+    let i = 0;
+    let xp = 0;
 
-    function nextWord() {
-        currentIndex = (currentIndex + 1) % vocabulary.length;
-        document.getElementById('pt-display').innerText = vocabulary[currentIndex].pt;
-        document.getElementById('en-display').innerText = vocabulary[currentIndex].en;
+    function next() {
+        // Animate AI Boy
+        const boy = document.getElementById('boy');
+        boy.classList.add('bounce');
+        setTimeout(() => boy.classList.remove('bounce'), 300);
+
+        // Logic
+        i = (i + 1) % vocab.length;
+        xp += 10;
+        
+        // Update UI
+        document.getElementById('pt').innerText = "Tradução de:";
+        document.getElementById('en').innerText = vocab[i].pt;
+        document.getElementById('xp').innerText = "XP: " + xp;
+        
+        // Update Progress
+        let progress = ((i + 1) / vocab.length) * 100;
+        document.getElementById('bar').style.width = progress + "%";
+
+        if(xp >= 70) {
+            alert("🔥 Mambo quente! Ganhaste o Nível 1!");
+            xp = 0;
+            document.getElementById('xp').innerText = "XP: 0";
+        }
     }
 
     function speak() {
-        const text = vocabulary[currentIndex].en;
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
+        const msg = new SpeechSynthesisUtterance(vocab[i].en);
+        msg.lang = 'en-US';
+        window.speechSynthesis.speak(msg);
     }
+    
+    // Set initial word
+    document.getElementById('en').innerText = vocab[0].pt;
 </script>
 
 </body>
