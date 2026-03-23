@@ -1,97 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Angola English Teacher</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; overflow: hidden; }
+        .stats { background: #202c33; padding: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; font-size: 0.8rem; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 100px; }
+        .m { max-width: 85%; padding: 12px; border-radius: 15px; line-height: 1.4; animation: fadeIn 0.2s; }
+        .bot { background: #202c33; align-self: flex-start; border-top-left-radius: 0; border-left: 3px solid #d81e05; }
+        .user { background: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
+        .input-area { position: fixed; bottom: 0; width: 100%; background: #202c33; padding: 15px; display: flex; gap: 10px; box-sizing: border-box; }
+        input { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 25px; color: white; font-size: 16px; outline: none; }
+        button { background: #f8d800; border: none; width: 50px; height: 50px; border-radius: 50%; color: black; font-weight: bold; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="stats">
+    <span>Lvl 1 Teacher 🇦🇴</span>
+    <span id="xp-tag">0 XP</span>
+</div>
+
+<div id="chat-box">
+    <div class="m bot"><b>Ready, Brother!</b> The bot is fixed. Type any word to start, or send me your <b>Verb to Be</b> lesson!</div>
+</div>
+
+<div class="input-area">
+    <input type="text" id="in" placeholder="Type here..." onkeypress="if(event.key==='Enter') send()">
+    <button onclick="send()">></button>
+</div>
+
 <script>
-    let currentVoice = 'en-US';
     let xp = 0;
 
-    // THE POWER 100 DICTIONARY
     const dictionary = [
-        // Top 20 (The Essentials)
-        { pt: "o", en: "The", tip: "Artigo: O carro, a casa." },
-        { pt: "ser", en: "Be", tip: "O verbo mais importante!" },
-        { pt: "para", en: "To / For", tip: "Direção ou propósito." },
-        { pt: "e", en: "And", tip: "Ligação: Tu e eu." },
-        { pt: "um", en: "A / An", tip: "Um objeto qualquer." },
-        { pt: "em", en: "In / On / At", tip: "Lugar ou tempo." },
-        { pt: "ter", en: "Have", tip: "Possessão." },
-        { pt: "eu", en: "I", tip: "Sempre com letra maiúscula (I)." },
-        { pt: "isso", en: "It", tip: "Para coisas ou animais." },
-        { pt: "nao", en: "Not / No", tip: "Negação." },
-        { pt: "em cima", en: "On", tip: "Superfície." },
-        { pt: "com", en: "With", tip: "Companhia." },
-        { pt: "ele", en: "He", tip: "Homem." },
-        { pt: "ela", en: "She", tip: "Mulher." },
-        { pt: "fazer", en: "Do / Make", tip: "Ação." },
-        { pt: "dizer", en: "Say", tip: "Falar algo." },
-        { pt: "este", en: "This", tip: "Perto de ti." },
-        { pt: "aquele", en: "That", tip: "Longe de ti." },
-        { pt: "eles", en: "They", tip: "Grupo de pessoas." },
-        { pt: "ir", en: "Go", tip: "Movimento." },
-
-        // Common Verbs & Actions
-        { pt: "querer", en: "Want", tip: "Desejo." },
-        { pt: "saber", en: "Know", tip: "Conhecimento." },
-        { pt: "pegar", en: "Get", tip: "Obter ou chegar." },
-        { pt: "ver", en: "See", tip: "Usar os olhos." },
-        { pt: "vir", en: "Come", tip: "Vir para cá." },
-        { pt: "pensar", en: "Think", tip: "Usar a cabeça." },
-        { pt: "olhar", en: "Look", tip: "Direcionar a visão." },
-        { pt: "dar", en: "Give", tip: "Entregar algo." },
-        { pt: "usar", en: "Use", tip: "Utilizar." },
-        { pt: "achar", en: "Find", tip: "Encontrar." },
-
-        // Time & Questions
-        { pt: "quando", en: "When", tip: "Tempo." },
-        { pt: "onde", en: "Where", tip: "Lugar." },
-        { pt: "quem", en: "Who", tip: "Pessoa." },
-        { pt: "porque", en: "Why", tip: "Razão." },
-        { pt: "como", en: "How", tip: "Maneira." },
-        { pt: "que", en: "What", tip: "O quê?" },
-        { pt: "agora", en: "Now", tip: "Neste momento." },
-        { pt: "depois", en: "Later", tip: "Mais tarde." },
-        { pt: "tempo", en: "Time", tip: "Relógio." },
-        { pt: "dia", en: "Day", tip: "24 horas." },
-
-        // Adjectives & Feelings
-        { pt: "bom", en: "Good", tip: "Positivo." },
-        { pt: "mau", en: "Bad", tip: "Negativo." },
-        { pt: "novo", en: "New", tip: "Recente." },
-        { pt: "velho", en: "Old", tip: "Antigo." },
-        { pt: "grande", en: "Big", tip: "Tamanho." },
-        { pt: "pequeno", en: "Small", tip: "Baixo/Curto." },
-        { pt: "feliz", en: "Happy", tip: "Alegre." },
-        { pt: "triste", en: "Sad", tip: "Em baixo." },
-        { pt: "fome", en: "Hungry", tip: "Quer comer." },
-        { pt: "sede", en: "Thirsty", tip: "Quer beber." },
-
-        // People & Places
-        { pt: "homem", en: "Man", tip: "Adulto masculino." },
-        { pt: "mulher", en: "Woman", tip: "Adulto feminino." },
-        { pt: "crianca", en: "Child", tip: "Miúdo." },
-        { pt: "amigo", en: "Friend", tip: "Kamba." },
-        { pt: "familia", en: "Family", tip: "Sangue." },
-        { pt: "casa", en: "House / Home", tip: "Onde vives." },
-        { pt: "escola", en: "School", tip: "Lugar de estudo." },
-        { pt: "trabalho", en: "Work", tip: "Emprego." },
-        { pt: "cidade", en: "City", tip: "Luanda, por exemplo." },
-        { pt: "mundo", en: "World", tip: "Planeta." },
-
-        // Phrases for Students
-        { pt: "ajuda", en: "Help", tip: "Socorro." },
-        { pt: "estamos juntos", en: "We are together", tip: "Classic Angola! 🇦🇴" },
-        { pt: "bom dia", en: "Good morning", tip: "Until noon." },
-        { pt: "boa noite", en: "Good night", tip: "When leaving/sleeping." },
-        { pt: "por favor", en: "Please", tip: "Be polite." },
-        { pt: "obrigado", en: "Thank you", tip: "Appreciation." },
-        { pt: "sim", en: "Yes", tip: "Afirmação." },
-        { pt: "nao", en: "No", tip: "Negação." },
-        { pt: "talvez", en: "Maybe", tip: "Dúvida." },
-        { pt: "desculpa", en: "Sorry", tip: "Erro." }
+        { pt: "ser", en: "Be", tip: "I am, You are, He is." },
+        { pt: "ter", en: "Have", tip: "I have a phone." },
+        { pt: "fazer", en: "Do", tip: "I do my work." },
+        { pt: "dizer", en: "Say", tip: "Say hello!" },
+        { pt: "ir", en: "Go", tip: "Go to school." },
+        { pt: "obrigado", en: "Thank you", tip: "Very polite." },
+        { pt: "estamos juntos", en: "We are together", tip: "Angolan style!" },
+        { pt: "bom dia", en: "Good morning", tip: "Greeting." },
+        { pt: "fome", en: "Hungry", tip: "Want to eat." },
+        { pt: "ajuda", en: "Help", tip: "I need help." }
+        // We will add the other 90 words once we verify this works!
     ];
-
-    function setV(v, id) {
-        currentVoice = v;
-        document.querySelectorAll('.v-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
 
     function send() {
         let input = document.getElementById('in');
@@ -102,24 +59,18 @@
         input.value = "";
 
         setTimeout(() => {
-            let msg = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Removes accents (é -> e)
+            let msg = val.toLowerCase();
             let found = dictionary.find(d => msg.includes(d.pt) || msg.includes(d.en.toLowerCase()));
 
             if(found) {
-                let response = `🇺🇸 <b>${found.en}</b><br><br>💡 ${found.tip}`;
-                addMsg(response, 'bot');
+                addMsg("🇺🇸 <b>" + found.en + "</b><br><br>💡 " + found.tip, 'bot');
                 speak(found.en);
-                updateXP(10);
+                xp += 10;
+                document.getElementById('xp-tag').innerText = xp + " XP";
             } else {
-                addMsg("I'm still learning that one, bro! Type 'Help' or 'Bom dia' to test me.", 'bot');
+                addMsg("I'm learning this one! Send me your Verb to Be lesson so I can teach better.", 'bot');
             }
-        }, 600);
-    }
-
-    function updateXP(amount) {
-        xp += amount;
-        document.getElementById('xp-tag').innerText = xp + " XP";
-        if(xp % 100 === 0 && xp !== 0) alert("🔥 MONSTRO! You just reached " + xp + " XP!");
+        }, 500);
     }
 
     function addMsg(t, s) {
@@ -133,8 +84,10 @@
 
     function speak(t) {
         let s = new SpeechSynthesisUtterance(t);
-        s.lang = currentVoice;
-        s.rate = 0.8;
+        s.lang = 'en-US';
         window.speechSynthesis.speak(s);
     }
 </script>
+
+</body>
+</html>
