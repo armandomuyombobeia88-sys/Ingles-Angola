@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola English Teacher</title>
+    <title>Angola AI Teacher 🇦🇴</title>
     <style>
         body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; overflow: hidden; }
-        .stats { background: #202c33; padding: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; font-size: 0.8rem; }
+        .stats { background: #202c33; padding: 10px 15px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; font-size: 0.8rem; }
         #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 100px; }
         .m { max-width: 85%; padding: 12px; border-radius: 15px; line-height: 1.4; animation: fadeIn 0.2s; }
         .bot { background: #202c33; align-self: flex-start; border-top-left-radius: 0; border-left: 3px solid #d81e05; }
@@ -25,69 +25,68 @@
 </div>
 
 <div id="chat-box">
-    <div class="m bot"><b>Ready, Brother!</b> The bot is fixed. Type any word to start, or send me your <b>Verb to Be</b> lesson!</div>
+    <div class="m bot"><b>100 Words Installed!</b> I'm ready, brother. Type anything or send me your <b>Verb to Be</b> lesson!</div>
 </div>
 
 <div class="input-area">
-    <input type="text" id="in" placeholder="Type here..." onkeypress="if(event.key==='Enter') send()">
+    <input type="text" id="in" placeholder="Diz algo..." onkeypress="if(event.key==='Enter') send()">
     <button onclick="send()">></button>
 </div>
 
 <script>
     let xp = 0;
-
     const dictionary = [
-        { pt: "ser", en: "Be", tip: "I am, You are, He is." },
-        { pt: "ter", en: "Have", tip: "I have a phone." },
-        { pt: "fazer", en: "Do", tip: "I do my work." },
-        { pt: "dizer", en: "Say", tip: "Say hello!" },
-        { pt: "ir", en: "Go", tip: "Go to school." },
-        { pt: "obrigado", en: "Thank you", tip: "Very polite." },
-        { pt: "estamos juntos", en: "We are together", tip: "Angolan style!" },
-        { pt: "bom dia", en: "Good morning", tip: "Greeting." },
-        { pt: "fome", en: "Hungry", tip: "Want to eat." },
-        { pt: "ajuda", en: "Help", tip: "I need help." }
-        // We will add the other 90 words once we verify this works!
+        { pt: "o", en: "The" }, { pt: "ser", en: "Be" }, { pt: "para", en: "To" }, { pt: "de", en: "Of" }, { pt: "e", en: "And" },
+        { pt: "um", en: "A" }, { pt: "em", en: "In" }, { pt: "que", en: "That" }, { pt: "ter", en: "Have" }, { pt: "eu", en: "I" },
+        { pt: "isso", en: "It" }, { pt: "para", en: "For" }, { pt: "nao", en: "Not" }, { pt: "em", en: "On" }, { pt: "com", en: "With" },
+        { pt: "ele", en: "He" }, { pt: "como", en: "As" }, { pt: "voce", en: "You" }, { pt: "fazer", en: "Do" }, { pt: "pelo", en: "At" },
+        { pt: "este", en: "This" }, { pt: "mas", en: "But" }, { pt: "dele", en: "His" }, { pt: "por", en: "By" }, { pt: "de", en: "From" },
+        { pt: "eles", en: "They" }, { pt: "nos", en: "We" }, { pt: "dizer", en: "Say" }, { pt: "ela", en: "She" }, { pt: "ou", en: "Or" },
+        { pt: "ir", en: "Go" }, { pt: "obter", en: "Get" }, { pt: "meu", en: "My" }, { pt: "um", en: "One" }, { pt: "ver", en: "See" },
+        { pt: "saber", en: "Know" }, { pt: "fazer", en: "Make" }, { pt: "tempo", en: "Time" }, { pt: "quem", en: "Who" }, { pt: "dar", en: "Give" },
+        { pt: "quando", en: "When" }, { pt: "onde", en: "Where" }, { pt: "porque", en: "Why" }, { pt: "como", en: "How" }, { pt: "todo", en: "All" },
+        { pt: "qualquer", en: "Any" }, { pt: "cada", en: "Each" }, { pt: "muito", en: "Very" }, { pt: "muitos", en: "Many" }, { pt: "algum", en: "Some" },
+        { pt: "ajuda", en: "Help" }, { pt: "obrigado", en: "Thank you" }, { pt: "por favor", en: "Please" }, { pt: "estamos juntos", en: "We are together" },
+        { pt: "bom dia", en: "Good morning" }, { pt: "boa noite", en: "Good night" }, { pt: "fome", en: "Hungry" }, { pt: "sede", en: "Thirsty" },
+        { pt: "feliz", en: "Happy" }, { pt: "triste", en: "Sad" }, { pt: "novo", en: "New" }, { pt: "velho", en: "Old" }, { pt: "bom", en: "Good" },
+        { pt: "mau", en: "Bad" }, { pt: "escola", en: "School" }, { pt: "trabalho", en: "Work" }, { pt: "casa", en: "Home" }, { pt: "familia", en: "Family" },
+        { pt: "amigo", en: "Friend" }, { pt: "mulher", en: "Woman" }, { pt: "homem", en: "Man" }, { pt: "crianca", en: "Child" }, { pt: "mundo", en: "World" },
+        { pt: "vida", en: "Life" }, { pt: "dia", en: "Day" }, { pt: "semana", en: "Week" }, { pt: "ano", en: "Year" }, { pt: "coisa", en: "Thing" },
+        { pt: "parte", en: "Part" }, { pt: "governo", en: "Government" }, { pt: "numero", en: "Number" }, { pt: "povo", en: "People" }, { pt: "grupo", en: "Group" },
+        { pt: "problema", en: "Problem" }, { pt: "mao", en: "Hand" }, { pt: "olho", en: "Eye" }, { pt: "agua", en: "Water" }, { pt: "carro", en: "Car" },
+        { pt: "cidade", en: "City" }, { pt: "pais", en: "Country" }, { pt: "estudo", en: "Study" }, { pt: "livro", en: "Book" }, { pt: "ponto", en: "Point" }
     ];
 
     function send() {
         let input = document.getElementById('in');
         let val = input.value.trim();
         if(!val) return;
-
         addMsg(val, 'user');
         input.value = "";
-
         setTimeout(() => {
             let msg = val.toLowerCase();
             let found = dictionary.find(d => msg.includes(d.pt) || msg.includes(d.en.toLowerCase()));
-
             if(found) {
-                addMsg("🇺🇸 <b>" + found.en + "</b><br><br>💡 " + found.tip, 'bot');
+                addMsg("🇺🇸 <b>" + found.en + "</b>", 'bot');
                 speak(found.en);
                 xp += 10;
                 document.getElementById('xp-tag').innerText = xp + " XP";
             } else {
-                addMsg("I'm learning this one! Send me your Verb to Be lesson so I can teach better.", 'bot');
+                addMsg("I'm learning! Send the Lesson to my teacher.", 'bot');
             }
         }, 500);
     }
-
     function addMsg(t, s) {
         let d = document.createElement('div');
-        d.className = 'm ' + s;
-        d.innerHTML = t;
+        d.className = 'm ' + s; d.innerHTML = t;
         let box = document.getElementById('chat-box');
-        box.appendChild(d);
-        box.scrollTop = box.scrollHeight;
+        box.appendChild(d); box.scrollTop = box.scrollHeight;
     }
-
     function speak(t) {
         let s = new SpeechSynthesisUtterance(t);
-        s.lang = 'en-US';
+        s.lang = 'en-US'; s.rate = 0.8;
         window.speechSynthesis.speak(s);
     }
 </script>
-
 </body>
 </html>
