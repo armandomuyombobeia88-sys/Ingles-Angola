@@ -1,102 +1,78 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>English Ai Boy 🇦🇴</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #000; color: white; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .app { width: 90%; max-width: 400px; text-align: center; }
+        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
         
-        /* The AI Boy Area */
-        .ai-boy { font-size: 5rem; margin-bottom: 10px; transition: 0.3s; display: inline-block; }
-        .bounce { transform: translateY(-20px) scale(1.1); }
+        /* Message Bubbles */
+        .msg { max-width: 80%; padding: 12px; border-radius: 15px; font-size: 1rem; line-height: 1.4; }
+        .bot { background: #202c33; color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user { background: #005c4b; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        /* Input Area */
+        .input-area { background: #202c33; padding: 10px; display: flex; gap: 10px; align-items: center; }
+        input { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 20px; color: white; outline: none; }
+        button { background: #00a884; border: none; color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
         
-        .stats { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: #f8d800; }
-        
-        .card { background: #1c1c1e; padding: 30px 20px; border-radius: 25px; border-bottom: 5px solid #d81e05; margin-bottom: 20px; }
-        .pt { color: #8e8e93; font-size: 1rem; margin-bottom: 5px; }
-        .en { color: #fff; font-size: 2.2rem; font-weight: 800; }
-        
-        button { background: #f8d800; color: #000; border: none; padding: 18px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; width: 100%; margin-bottom: 10px; box-shadow: 0 4px #b39b00; }
-        button:active { box-shadow: none; transform: translateY(4px); }
-        .audio-btn { background: #007aff; color: white; box-shadow: 0 4px #004da1; }
-        
-        .progress-container { background: #333; height: 10px; border-radius: 5px; margin-top: 20px; overflow: hidden; }
-        .progress-bar { background: #d81e05; height: 100%; width: 0%; transition: 0.5s; }
+        .header { background: #202c33; color: #00a884; padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px solid #333; }
     </style>
 </head>
 <body>
 
-<div class="app">
-    <div id="boy" class="ai-boy">🤖</div>
-    
-    <div class="stats">
-        <span>Nível 1</span>
-        <span id="xp">XP: 0</span>
-    </div>
+<div class="header">Angola English AI 🇦🇴</div>
+<div id="chat-window">
+    <div class="msg bot">Olá! Eu sou o teu Chatbot de Inglês. Escreve qualquer coisa em Português e eu ensino-te como se diz em Inglês!</div>
+</div>
 
-    <div class="card">
-        <div class="pt" id="pt">Como se diz...</div>
-        <div id="en" class="en">Bom dia</div>
-    </div>
-    
-    <button class="audio-btn" onclick="speak()">Ouvir Pronúncia 🔊</button>
-    <button onclick="next()">Acertou! Próxima (+10 XP) 🚀</button>
-
-    <div class="progress-container">
-        <div id="bar" class="progress-bar"></div>
-    </div>
+<div class="input-area">
+    <input type="text" id="userInput" placeholder="Escreve aqui...">
+    <button onclick="sendMessage()">Enviar</button>
 </div>
 
 <script>
-    const vocab = [
-        {pt: "Bom dia", en: "Good morning"},
-        {pt: "Tudo bem?", en: "How are you?"},
-        {pt: "Faz favor", en: "Please"},
-        {pt: "Obrigado", en: "Thank you"},
-        {pt: "Estamos juntos", en: "We are together"},
-        {pt: "Tenho uma mambo para ti", en: "I have something for you"},
-        {pt: "Até amanhã", en: "See you tomorrow"}
-    ];
-    
-    let i = 0;
-    let xp = 0;
+    // Simple "Brain" for the bot
+    const dictionary = {
+        "oi": "Hi! In English we say: 'Hello' or 'Hi'.",
+        "tudo bem": "You can say: 'How are you?' or 'I am fine'.",
+        "como estas": "In English: 'How are you doing?'",
+        "obrigado": "That is: 'Thank you!'",
+        "mambo": "A 'mambo' can be a 'thing' or 'business' in English.",
+        "fome": "Say: 'I am hungry'.",
+        "estamos juntos": "We say: 'We are together' or 'I got your back!'"
+    };
 
-    function next() {
-        // Animate AI Boy
-        const boy = document.getElementById('boy');
-        boy.classList.add('bounce');
-        setTimeout(() => boy.classList.remove('bounce'), 300);
+    function sendMessage() {
+        const input = document.getElementById('userInput');
+        const text = input.value.toLowerCase().trim();
+        if (text === "") return;
 
-        // Logic
-        i = (i + 1) % vocab.length;
-        xp += 10;
-        
-        // Update UI
-        document.getElementById('pt').innerText = "Tradução de:";
-        document.getElementById('en').innerText = vocab[i].pt;
-        document.getElementById('xp').innerText = "XP: " + xp;
-        
-        // Update Progress
-        let progress = ((i + 1) / vocab.length) * 100;
-        document.getElementById('bar').style.width = progress + "%";
+        addMessage(input.value, 'user');
+        input.value = "";
 
-        if(xp >= 70) {
-            alert("🔥 Mambo quente! Ganhaste o Nível 1!");
-            xp = 0;
-            document.getElementById('xp').innerText = "XP: 0";
-        }
+        // Bot "Thinking" delay
+        setTimeout(() => {
+            let reply = "Desculpa, ainda estou a aprender essa! Tenta 'Oi' ou 'Obrigado'.";
+            
+            // Check dictionary
+            for (let key in dictionary) {
+                if (text.includes(key)) {
+                    reply = dictionary[key];
+                }
+            }
+            addMessage(reply, 'bot');
+        }, 600);
     }
 
-    function speak() {
-        const msg = new SpeechSynthesisUtterance(vocab[i].en);
-        msg.lang = 'en-US';
-        window.speechSynthesis.speak(msg);
+    function addMessage(text, sender) {
+        const div = document.createElement('div');
+        div.className = `msg ${sender}`;
+        div.innerText = text;
+        const window = document.getElementById('chat-window');
+        window.appendChild(div);
+        window.scrollTop = window.scrollHeight;
     }
-    
-    // Set initial word
-    document.getElementById('en').innerText = vocab[0].pt;
 </script>
 
 </body>
