@@ -2,19 +2,139 @@
     let currentVoice = 'en-US';
     let xp = 0;
 
-    // --- THE MASTER DICTIONARY ---
-    // You can add 1,000+ words here. Just follow the pattern.
+    // THE POWER 100 DICTIONARY
     const dictionary = [
-        // GREETINGS
-        { pt: "bom dia", en: "Good morning", tip: "Until 12:00" },
-        { pt: "boa tarde", en: "Good afternoon", tip: "12:00 to 18:00" },
-        { pt: "boa noite", en: "Good evening", tip: "Greeting at night" },
-        { pt: "como estas", en: "How are you?", tip: "Standard" },
-        { pt: "tudo bem", en: "How's it going?", tip: "Casual" },
-        
-        // COMMON EXPRESSIONS
-        { pt: "obrigado", en: "Thank you", tip: "Essential!" },
-        { pt: "de nada", en: "You're welcome", tip: "Response to thanks" },
-        { pt: "faz favor", en: "Please", tip: "Be polite" },
-        { pt: "desculpa", en: "I'm sorry", tip: "To apologize" },
-        { pt: "com licença", en: "Excuse me", tip
+        // Top 20 (The Essentials)
+        { pt: "o", en: "The", tip: "Artigo: O carro, a casa." },
+        { pt: "ser", en: "Be", tip: "O verbo mais importante!" },
+        { pt: "para", en: "To / For", tip: "Direção ou propósito." },
+        { pt: "e", en: "And", tip: "Ligação: Tu e eu." },
+        { pt: "um", en: "A / An", tip: "Um objeto qualquer." },
+        { pt: "em", en: "In / On / At", tip: "Lugar ou tempo." },
+        { pt: "ter", en: "Have", tip: "Possessão." },
+        { pt: "eu", en: "I", tip: "Sempre com letra maiúscula (I)." },
+        { pt: "isso", en: "It", tip: "Para coisas ou animais." },
+        { pt: "nao", en: "Not / No", tip: "Negação." },
+        { pt: "em cima", en: "On", tip: "Superfície." },
+        { pt: "com", en: "With", tip: "Companhia." },
+        { pt: "ele", en: "He", tip: "Homem." },
+        { pt: "ela", en: "She", tip: "Mulher." },
+        { pt: "fazer", en: "Do / Make", tip: "Ação." },
+        { pt: "dizer", en: "Say", tip: "Falar algo." },
+        { pt: "este", en: "This", tip: "Perto de ti." },
+        { pt: "aquele", en: "That", tip: "Longe de ti." },
+        { pt: "eles", en: "They", tip: "Grupo de pessoas." },
+        { pt: "ir", en: "Go", tip: "Movimento." },
+
+        // Common Verbs & Actions
+        { pt: "querer", en: "Want", tip: "Desejo." },
+        { pt: "saber", en: "Know", tip: "Conhecimento." },
+        { pt: "pegar", en: "Get", tip: "Obter ou chegar." },
+        { pt: "ver", en: "See", tip: "Usar os olhos." },
+        { pt: "vir", en: "Come", tip: "Vir para cá." },
+        { pt: "pensar", en: "Think", tip: "Usar a cabeça." },
+        { pt: "olhar", en: "Look", tip: "Direcionar a visão." },
+        { pt: "dar", en: "Give", tip: "Entregar algo." },
+        { pt: "usar", en: "Use", tip: "Utilizar." },
+        { pt: "achar", en: "Find", tip: "Encontrar." },
+
+        // Time & Questions
+        { pt: "quando", en: "When", tip: "Tempo." },
+        { pt: "onde", en: "Where", tip: "Lugar." },
+        { pt: "quem", en: "Who", tip: "Pessoa." },
+        { pt: "porque", en: "Why", tip: "Razão." },
+        { pt: "como", en: "How", tip: "Maneira." },
+        { pt: "que", en: "What", tip: "O quê?" },
+        { pt: "agora", en: "Now", tip: "Neste momento." },
+        { pt: "depois", en: "Later", tip: "Mais tarde." },
+        { pt: "tempo", en: "Time", tip: "Relógio." },
+        { pt: "dia", en: "Day", tip: "24 horas." },
+
+        // Adjectives & Feelings
+        { pt: "bom", en: "Good", tip: "Positivo." },
+        { pt: "mau", en: "Bad", tip: "Negativo." },
+        { pt: "novo", en: "New", tip: "Recente." },
+        { pt: "velho", en: "Old", tip: "Antigo." },
+        { pt: "grande", en: "Big", tip: "Tamanho." },
+        { pt: "pequeno", en: "Small", tip: "Baixo/Curto." },
+        { pt: "feliz", en: "Happy", tip: "Alegre." },
+        { pt: "triste", en: "Sad", tip: "Em baixo." },
+        { pt: "fome", en: "Hungry", tip: "Quer comer." },
+        { pt: "sede", en: "Thirsty", tip: "Quer beber." },
+
+        // People & Places
+        { pt: "homem", en: "Man", tip: "Adulto masculino." },
+        { pt: "mulher", en: "Woman", tip: "Adulto feminino." },
+        { pt: "crianca", en: "Child", tip: "Miúdo." },
+        { pt: "amigo", en: "Friend", tip: "Kamba." },
+        { pt: "familia", en: "Family", tip: "Sangue." },
+        { pt: "casa", en: "House / Home", tip: "Onde vives." },
+        { pt: "escola", en: "School", tip: "Lugar de estudo." },
+        { pt: "trabalho", en: "Work", tip: "Emprego." },
+        { pt: "cidade", en: "City", tip: "Luanda, por exemplo." },
+        { pt: "mundo", en: "World", tip: "Planeta." },
+
+        // Phrases for Students
+        { pt: "ajuda", en: "Help", tip: "Socorro." },
+        { pt: "estamos juntos", en: "We are together", tip: "Classic Angola! 🇦🇴" },
+        { pt: "bom dia", en: "Good morning", tip: "Until noon." },
+        { pt: "boa noite", en: "Good night", tip: "When leaving/sleeping." },
+        { pt: "por favor", en: "Please", tip: "Be polite." },
+        { pt: "obrigado", en: "Thank you", tip: "Appreciation." },
+        { pt: "sim", en: "Yes", tip: "Afirmação." },
+        { pt: "nao", en: "No", tip: "Negação." },
+        { pt: "talvez", en: "Maybe", tip: "Dúvida." },
+        { pt: "desculpa", en: "Sorry", tip: "Erro." }
+    ];
+
+    function setV(v, id) {
+        currentVoice = v;
+        document.querySelectorAll('.v-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function send() {
+        let input = document.getElementById('in');
+        let val = input.value.trim();
+        if(!val) return;
+
+        addMsg(val, 'user');
+        input.value = "";
+
+        setTimeout(() => {
+            let msg = val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Removes accents (é -> e)
+            let found = dictionary.find(d => msg.includes(d.pt) || msg.includes(d.en.toLowerCase()));
+
+            if(found) {
+                let response = `🇺🇸 <b>${found.en}</b><br><br>💡 ${found.tip}`;
+                addMsg(response, 'bot');
+                speak(found.en);
+                updateXP(10);
+            } else {
+                addMsg("I'm still learning that one, bro! Type 'Help' or 'Bom dia' to test me.", 'bot');
+            }
+        }, 600);
+    }
+
+    function updateXP(amount) {
+        xp += amount;
+        document.getElementById('xp-tag').innerText = xp + " XP";
+        if(xp % 100 === 0 && xp !== 0) alert("🔥 MONSTRO! You just reached " + xp + " XP!");
+    }
+
+    function addMsg(t, s) {
+        let d = document.createElement('div');
+        d.className = 'm ' + s;
+        d.innerHTML = t;
+        let box = document.getElementById('chat-box');
+        box.appendChild(d);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function speak(t) {
+        let s = new SpeechSynthesisUtterance(t);
+        s.lang = currentVoice;
+        s.rate = 0.8;
+        window.speechSynthesis.speak(s);
+    }
+</script>
