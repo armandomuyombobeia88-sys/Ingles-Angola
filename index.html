@@ -1,130 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola AI Teacher</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; height: 100vh; display: flex; flex-direction: column; color: white; }
-        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 120px; }
-        .m { max-width: 90%; padding: 14px; border-radius: 15px; font-size: 0.95rem; line-height: 1.5; }
-        .bot { background: #232d36; align-self: flex-start; border-left: 4px solid #d81e05; }
-        .user { background: #005c4b; align-self: flex-end; }
-        .input-area { position: fixed; bottom: 0; width: 100%; background: #111b21; padding: 15px; display: flex; gap: 10px; box-sizing: border-box; border-top: 1px solid #333; }
-        input { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 10px; color: white; font-size: 16px; outline: none; }
-        .btn { background: #f8d800; color: black; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
-        b { color: #f8d800; }
-    </style>
-</head>
-<body>
+// The 50 core words
+const core50 = [
+  "the", "be", "to", "of", "and", "a", "in", "that", "have", "i",
+  "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
+  "this", "but", "his", "by", "from", "they", "we", "say", "her", "she",
+  "or", "an", "will", "my", "one", "all", "would", "there", "their", "what",
+  "so", "up", "out", "if", "about", "who", "get", "which", "go", "me"
+];
 
-<div id="chat-box">
-    <div class="m bot"><b>🇺🇸 American Teacher Online!</b><br>I now know the 50 most common words. Type <b>'Aula'</b> for the Verb to Be lesson!</div>
-</div>
+// The function that runs when you hit "SEND"
+function teacherBot(userInput) {
+    const inputWords = userInput.toLowerCase().split(" ");
+    const found = core50.filter(word => inputWords.includes(word));
 
-<div class="input-area">
-    <input type="text" id="in" placeholder="Type a word..." autocomplete="off">
-    <button class="btn" onclick="sendMsg()">SEND</button>
-</div>
-
-<script>
-    // 50 MOST COMMON WORDS + ANGOLAN PHRASES
-    const brain = {
-        "ola": "Hello!", "oi": "Hi!", "bom dia": "Good morning", "boa tarde": "Good afternoon", "boa noite": "Good night",
-        "obrigado": "Thank you", "por favor": "Please", "estamos juntos": "We are together", "mambo": "Thing",
-        "sim": "Yes", "nao": "No", "quem": "Who", "o que": "What", "onde": "Where", "quando": "When", "porque": "Why", "como": "How",
-        "eu": "I", "voce": "You", "ele": "He", "ela": "She", "nos": "We", "eles": "They",
-        "ser": "Be", "ter": "Have", "fazer": "Do", "dizer": "Say", "ir": "Go", "ver": "See", "saber": "Know",
-        "querer": "Want", "vir": "Come", "pensar": "Think", "pegar": "Get", "dar": "Give", "usar": "Use", "achar": "Find",
-        "casa": "Home", "escola": "School", "trabalho": "Work", "familia": "Family", "amigo": "Friend",
-        "bom": "Good", "mau": "Bad", "feliz": "Happy", "triste": "Sad", "fome": "Hungry", "sede": "Thirsty", "agua": "Water", "comida": "Food"
-    };
-
-    const verbToBeLesson = `
-    👨‍🏫 <b>VERB TO BE (Ser/Estar)</b><br><br>
-    <b>1. PRESENT (Presente)</b><br>
-    • I <b>am</b> (Eu sou/estou)<br>
-    • You <b>are</b> (Tu és/estás)<br>
-    • He/She/It <b>is</b> (Ele/Ela é/está)<br>
-    • We <b>are</b> (Nós somos/estamos)<br>
-    • They <b>are</b> (Eles são/estão)<br><br>
-    
-    <b>2. PAST (Passado)</b><br>
-    • I/He/She/It <b>was</b> (Eu era/estava)<br>
-    • You/We/They <b>were</b> (Tu eras/estavas)<br><br>
-    
-    <b>3. FUTURE (Futuro)</b><br>
-    • I <b>will be</b> (Eu serei/estarei)<br>
-    • You <b>will be</b> (Tu serás/estarás)<br>
-    • He/She/It <b>will be</b> (Ele será/estará)
-    `;
-
-    function sendMsg() {
-        const input = document.getElementById('in');
-        const text = input.value.trim().toLowerCase();
-        if (!text) return;
-
-        addBubble(input.value, 'user');
-        input.value = "";
-        
-        setTimeout(() => {
-            if (text === "aula" || text === "lesson" || text.includes("verb")) {
-                addBubble(verbToBeLesson, 'bot');
-                speak("I am, You are, He is. I was, You were. I will be, You will be.");
-            } else if (brain[text]) {
-                const reply = brain[text];
-                addBubble("🇺🇸 <b>" + reply + "</b>", 'bot');
-                speak(reply);
-            } else {
-                addBubble("I don't know that one yet! Try <b>'Home'</b>, <b>'Water'</b>, or <b>'Aula'</b>.", 'bot');
-            }
-        }, 400);
+    if (found.length > 0) {
+        return "Great job! You used these core words: " + found.join(", ") + ".";
+    } else {
+        return "Good start! Try using common words like 'the', 'is', or 'and' to build a sentence.";
     }
-
-    function addBubble(txt, side) {
-        const div = document.createElement('div');
-        div.className = 'm ' + side;
-        div.innerHTML = txt;
-        const box = document.getElementById('chat-box');
-        box.appendChild(div);
-        box.scrollTop = box.scrollHeight;
-    }
-
-    // LOCKED TO AMERICAN ENGLISH
-    function speak(t) {
-        const s = new SpeechSynthesisUtterance(t);
-        s.lang = 'en-US'; // American English
-        s.rate = 0.85;    // Natural pace
-        s.pitch = 1.0;
-        window.speechSynthesis.speak(s);
-    }
-</script>
-
-</body>
-</html>
-{
-  "beginner_core_50": [
-    "the", "be", "to", "of", "and", "a", "in", "that", "have", "i",
-    "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
-    "this", "but", "his", "by", "from", "they", "we", "say", "her", "she",
-    "or", "an", "will", "my", "one", "all", "would", "there", "their", "what",
-    "so", "up", "out", "if", "about", "who", "get", "which", "go", "me"
-  ]import json
-
-# This opens the file you just made
-with open('vocabulary.json') as f:
-    data = json.load(f)
-    word_list = data['beginner_core_50']
-
-def teacher_bot(student_input):
-    # Check if the student used any of the 50 words
-    found = [word for word in word_list if word in student_input.lower().split()]
-    
-    if len(found) > 0:
-        return f"Great job! You used these core words: {', '.join(found)}"
-    else:
-        return "Try using more common words to build your foundation!"
-
-# Test it
-print(teacher_bot("I have a book"))
 }
