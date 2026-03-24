@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mestre AI Elite</title>
+    <style>
+        body { background: #0a0a0a; color: #eee; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
+        #chat { flex-grow: 1; border: 1px solid #333; border-radius: 15px; padding: 15px; overflow-y: auto; background: #111; margin-bottom: 10px; }
+        .bot { color: #00ffcc; margin-bottom: 15px; border-left: 4px solid #ffd700; padding-left: 10px; }
+        .user { color: #ffd700; margin-bottom: 15px; text-align: right; font-weight: bold; }
+        .controls { display: flex; gap: 5px; padding-bottom: 10px; }
+        input { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: white; -webkit-appearance: none; }
+        button { padding: 15px 25px; background: #ffd700; border: none; border-radius: 12px; font-weight: bold; color: black; }
+    </style>
+</head>
+<body>
+    <h3 style="text-align:center; color:#ffd700;">MESTRE AI ELITE 🇦🇴</h3>
+    <div id="chat"><div class="bot"><b>Mestre:</b> Ready for Lesson 1! / Pronto para a Lição 1!</div></div>
+    <div class="controls">
+        <input type="text" id="words" placeholder="Escreva aqui..." autocomplete="off">
+        <button onclick="p()">SEND</button>
+    </div>
+    <script>
+        var lib = {
+            "red":"Vermelho","blue":"Azul","green":"Verde","yellow":"Amarelo","black":"Preto","white":"Branco",
+            "bread":"Pao","water":"Agua","rice":"Arroz","meat":"Carne","chicken":"Frango","fish":"Peixe",
+            "house":"Casa","school":"Escola","hospital":"Hospital","market":"Mercado","bank":"Banco",
+            "hello":"Ola","ok":"Esta bem","yes":"Sim","no":"Nao","work":"Trabalhar","speak":"Falar"
+        };
+        function f(t){window.speechSynthesis.cancel();var m=new SpeechSynthesisUtterance(t);m.lang='en-US';m.rate=0.8;window.speechSynthesis.speak(m);}
+        function p(){
+            var c=document.getElementById("words"), t=document.getElementById("chat"), i=c.value.trim().toLowerCase();
+            if(!i)return; t.innerHTML+="<div class='user'>"+i+"</div>";
+            var en="I am learning "+i, pt="Estou a aprender "+i;
+            if(i.includes("lesson")){en="Lesson 1: Colors. Red is Vermelho, Blue is Azul."; pt="Lição 1: Cores. Red é Vermelho, Blue é Azul.";}
+            else if(lib[i]){en="The translation is "+lib[i]; pt=i.toUpperCase()+" é "+lib[i];}
+            else{for(var k in lib){if(lib[k].toLowerCase()===i){en="In English we say: "+k.toUpperCase(); pt="Em Inglês dizemos: "+k.toUpperCase(); break;}}}
+            t.innerHTML+="<div class='bot'><b>Mestre:</b> "+en+"<br><small>"+pt+"</small></div>";
+            f(en); c.value=""; t.scrollTop=t.scrollHeight;
+        }
+    </script>
+</body>
+</html>
