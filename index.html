@@ -3,170 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - Luxury Empire</title>
+    <title>Mestre AI - Imperial Edition</title>
     <style>
         :root { 
             --gold: #ffd700; --dark: #050505; --surface: #121212; 
-            --accent: #00ffcc; --legendary: #ff00ff; --rare: #0077ff; 
+            --accent: #00ffcc; --legendary: #ff00ff; --danger: #ff4444;
         }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s; }
-        body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+        body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; }
 
-        header { padding: 15px 20px; background: #000; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        /* EPIC HOME SCREEN */
+        #home-screen {
+            position: fixed; inset: 0; z-index: 3000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), var(--dark)), 
+                        url('https://images.unsplash.com/photo-1544033527-b192daee1f5b?auto=format&fit=crop&q=80&w=1000');
+            background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 30px; text-align: center;
+        }
+        .hero-title { font-size: 50px; font-weight: 900; color: var(--gold); margin: 0; letter-spacing: -2px; text-shadow: 0 10px 30px rgba(0,0,0,1); }
+        .hero-sub { color: var(--accent); letter-spacing: 5px; font-size: 12px; font-weight: bold; margin-bottom: 40px; }
         
-        /* THE LEADERBOARD */
-        #leaderboard { background: #111; padding: 10px 20px; font-size: 11px; display: flex; gap: 20px; overflow-x: auto; border-bottom: 1px solid #333; color: #888; }
-        .top-user { white-space: nowrap; font-weight: bold; }
-        .top-user.me { color: var(--gold); }
+        .main-stats { display: flex; gap: 20px; margin-bottom: 40px; }
+        .stat-box { background: rgba(255,255,255,0.05); padding: 15px 25px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.2); backdrop-filter: blur(10px); }
+        
+        .play-btn { 
+            background: var(--gold); color: black; padding: 20px 60px; border-radius: 50px; 
+            font-weight: 900; font-size: 18px; border: none; cursor: pointer;
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3);
+        }
 
-        /* SHOP & UI */
-        #shop-overlay { position: fixed; inset: 0; z-index: 2000; background: #000; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
-        .mascot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .card { background: #1a1a1a; padding: 15px; border-radius: 20px; border: 1px solid #333; text-align: center; }
-        .card.active { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
+        /* GAME MODE: CANDONGUEIRO DASH */
+        #game-overlay {
+            position: fixed; inset: 0; z-index: 2500; background: var(--dark);
+            display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+        }
+        .timer-circle { width: 100px; height: 100px; border: 5px solid var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; margin-bottom: 20px; box-shadow: 0 0 20px var(--danger); }
 
-        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .bubble { max-width: 85%; padding: 15px; border-radius: 20px; line-height: 1.4; animation: pop 0.4s ease; }
-        .bot { background: var(--surface); border: 1px solid #222; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .user { background: var(--gold); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 800; }
+        /* APP INTERFACE */
+        #app { display: none; height: 100vh; flex-direction: column; }
+        header { padding: 15px 20px; background: #000; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 80%; padding: 15px; border-radius: 20px; animation: pop 0.3s forwards; }
+        .bot { background: var(--surface); border: 1px solid #333; align-self: flex-start; }
+        .user { background: var(--gold); color: #000; align-self: flex-end; font-weight: bold; }
 
-        .builder { background: var(--surface); padding: 15px; border-radius: 30px 30px 0; border-top: 1px solid #333; max-height: 55vh; overflow-y: auto; }
-        .cat-label { font-size: 10px; color: #666; text-transform: uppercase; margin: 12px 0 5px; font-weight: 900; letter-spacing: 1px; }
-        .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .chip { background: #111; padding: 10px 16px; border-radius: 12px; border: 1px solid #333; white-space: nowrap; cursor: pointer; font-size: 13px; color: #bbb; }
-        .chip:active { background: var(--gold); color: #000; }
+        /* BUILDER */
+        .builder { background: var(--surface); padding: 20px; border-radius: 40px 40px 0 0; border-top: 1px solid #444; }
+        .chip-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .chip { background: #000; padding: 12px 20px; border-radius: 15px; border: 1px solid #333; white-space: nowrap; font-size: 14px; cursor: pointer; }
+        .chip:active { background: var(--gold); color: black; }
 
-        .input-group { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 20px; border: 1px solid #333; margin-top: 10px; }
+        .input-group { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 25px; border: 1px solid #444; }
         input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; }
-        .send-btn { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; color: black; font-weight: 900; }
 
-        @keyframes pop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes pop { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div id="shop-overlay">
-        <h1 style="color:var(--gold)">MASCOT EMPIRE SHOP</h1>
-        <div class="mascot-grid" id="shop-list"></div>
-        <button onclick="toggleShop()" style="margin-top:20px; padding:15px; background:white; border:none; border-radius:15px; font-weight:bold; width:100%;">BACK TO STREETS</button>
+    <div id="home-screen">
+        <h1 class="hero-title">MESTRE AI</h1>
+        <div class="hero-sub">ANGOLA ELITE ACADEMY</div>
+        
+        <div class="main-stats">
+            <div class="stat-box">
+                <div style="font-size: 10px; color: #888;">WEALTH</div>
+                <div style="color: var(--gold); font-weight: 900;"><span id="home-coins">3000</span> Kz</div>
+            </div>
+            <div class="stat-box">
+                <div style="font-size: 10px; color: #888;">RANK</div>
+                <div style="color: var(--accent); font-weight: 900;">#15 LUANDA</div>
+            </div>
+        </div>
+
+        <button class="play-btn" onclick="startGame()">START MISSION</button>
+        <p style="margin-top: 20px; font-size: 12px; color: #666;">Unlock the Albino King in the Shop</p>
     </div>
 
-    <div id="leaderboard">
-        <span class="top-user">1. Rei de Luanda (550k)</span>
-        <span class="top-user">2. Rainha Fuba (410k)</span>
-        <span class="top-user me">15. BOSS (YOU) - <span id="board-coins">3000</span></span>
-        <span class="top-user">16. Candongueiro Pro (2800)</span>
-    </div>
-
-    <header>
-        <button onclick="toggleShop()" style="background:transparent; border:none; color:white; font-size:22px;">🛍️</button>
-        <div style="font-weight: 900; color: var(--gold); font-size: 18px;">💰 <span id="coins">3000</span> Kz</div>
-        <div style="color:var(--accent); font-weight:800; font-size:11px;">📍 CANDONGUEIRO STOP</div>
-    </header>
-
-    <div id="chat">
-        <div class="bubble bot">
-            <div id="mestre-icon" style="font-size:40px;">🦌</div>
-            <div><b>Mestre:</b><br>Lesson 6: <b>The Candongueiro!</b> You're in a taxi. How do you tell the driver where to go?</div>
+    <div id="game-overlay">
+        <div class="timer-circle" id="timer">10</div>
+        <h2 style="color: var(--danger);">CANDONGUEIRO DASH!</h2>
+        <p id="game-prompt">Translate: "Stop at the gas station!"</p>
+        <div class="input-group" style="width: 100%;">
+            <input type="text" id="game-input" placeholder="Type fast...">
+            <button onclick="checkGame()" style="background:var(--danger); border:none; padding:10px 20px; border-radius:15px; color:white; font-weight:bold;">GO!</button>
         </div>
     </div>
 
-    <div class="builder">
-        <div class="cat-label">Taxi Directions</div>
-        <div class="chip-scroll" id="row-dir"></div>
-        <div class="cat-label">The Fare (O Troco)</div>
-        <div class="chip-scroll" id="row-pay"></div>
-        <div class="cat-label">Destinations</div>
-        <div class="chip-scroll" id="row-dest"></div>
+    <div id="app">
+        <header>
+            <div style="font-weight: 900; color: var(--gold);">💰 <span id="app-coins">3000</span> Kz</div>
+            <div style="font-size: 18px;">🐘</div>
+            <button onclick="exitToHome()" style="background:transparent; border:none; color:white;">✖</button>
+        </header>
 
-        <div class="input-group">
-            <input type="text" id="main-input" placeholder="Tell the driver..." readonly>
-            <button class="send-btn" onclick="process()">➔</button>
+        <div id="chat">
+            <div class="msg bot">
+                <b>Mestre:</b> 🦌<br>
+                Welcome to <b>Ilha do Cabo (Lesson 7)</b>. Let's learn how to order at the beach!
+            </div>
+        </div>
+
+        <div class="builder">
+            <div class="chip-scroll" id="row-order"></div>
+            <div class="chip-scroll" id="row-drinks"></div>
+            <div class="chip-scroll" id="row-beach"></div>
+            <div class="input-group">
+                <input type="text" id="words-in" readonly>
+                <button onclick="sendMsg()" style="background:var(--gold); border:none; border-radius:50%; width:40px; height:40px;">➔</button>
+            </div>
         </div>
     </div>
 
     <script>
         let coins = 3000;
-        let inventory = { owned: ['palanca'], active: 'palanca' };
-        
-        const mascots = {
-            palanca: { icon: '🦌', name: 'Palanca', price: 0, rarity: 'BASIC' },
-            elephant: { icon: '🐘', name: 'Tank Elephant', price: 1500, rarity: 'EASY' },
-            giraffe: { icon: '🦒', name: 'Scout Giraffe', price: 15000, rarity: 'ELITE' },
-            lion: { icon: '🦁', name: 'Muscle Lion', price: 50000, rarity: 'ROYAL' },
-            albino_lion: { icon: '⚪🦁', name: 'Albino King', price: 150000, rarity: 'LEGENDARY' }
+        let time = 10;
+        let timerInt;
+
+        const beachVocab = {
+            order: ["I want", "Please bring me", "How much is", "A plate of"],
+            drinks: ["cold beer", "fresh juice", "water", "coconut water"],
+            beach: ["grilled fish", "mufete", "the bill", "a chair", "sunscreen"]
         };
 
-        const taxiBrain = {
-            "stop here": "pára aqui", "next stop": "próxima paragem", "keep the change": "fica com o troco",
-            "how much": "quanto é", "straight": "frente", "left": "esquerda", "right": "direita",
-            "gas station": "bomba", "market": "mercado", "airport": "aeroporto"
-        };
+        const brain = { "beer": "cerveja", "fish": "peixe", "water": "água", "bill": "conta" };
 
-        const vocab = {
-            dir: ["Stop here", "Next stop", "Go straight", "Turn left", "Turn right", "Pé no chão!"],
-            pay: ["How much is the trip?", "Here is the money", "Keep the change", "Do you have change?"],
-            dest: ["to the Airport", "to the Market", "to Mutamba", "to Talatona", "to the Hospital"]
-        };
+        function startGame() {
+            // Trigger the Dash Game first
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('game-overlay').style.display = 'flex';
+            startTimer();
+        }
 
-        function renderShop() {
-            const list = document.getElementById('shop-list');
-            list.innerHTML = "";
-            for(let id in mascots) {
-                const m = mascots[id];
-                const owned = inventory.owned.includes(id);
-                list.innerHTML += `
-                    <div class="card ${inventory.active === id ? 'active' : ''}">
-                        <div style="font-size:40px;">${m.icon}</div>
-                        <b>${m.name}</b><br>
-                        <small style="color:${m.price > 10000 ? 'var(--legendary)' : '#888'}">${m.rarity}</small><br><br>
-                        ${owned ? `<button onclick="equip('${id}')">EQUIP</button>` : `<button onclick="buy('${id}')">BUY ${m.price} Kz</button>`}
-                    </div>`;
+        function startTimer() {
+            time = 10;
+            timerInt = setInterval(() => {
+                time--;
+                document.getElementById('timer').innerText = time;
+                if(time <= 0) {
+                    clearInterval(timerInt);
+                    alert("Too slow! The Candongueiro left!");
+                    enterApp();
+                }
+            }, 1000);
+        }
+
+        function checkGame() {
+            const val = document.getElementById('game-input').value.toLowerCase();
+            if(val.includes("pára") || val.includes("bomba")) {
+                clearInterval(timerInt);
+                coins += 500;
+                alert("Perfect! +500 Kz Bonus!");
+                enterApp();
+            } else {
+                alert("Wrong translation! Try again.");
             }
         }
 
-        function buy(id) {
-            if(coins >= mascots[id].price) {
-                coins -= mascots[id].price;
-                inventory.owned.push(id);
-                renderShop();
-                updateUI();
-            } else { alert("Not enough Kwanza! Keep studying to earn more."); }
+        function enterApp() {
+            document.getElementById('game-overlay').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            document.getElementById('app-coins').innerText = coins;
+            renderChips();
         }
 
-        function equip(id) { inventory.active = id; document.getElementById('mestre-icon').innerText = mascots[id].icon; toggleShop(); }
-        function toggleShop() { const s = document.getElementById('shop-overlay'); s.style.display = s.style.display === 'flex' ? 'none' : 'flex'; renderShop(); }
-        function renderChips() { for(let cat in vocab) { document.getElementById('row-' + cat).innerHTML = vocab[cat].map(w => `<div class="chip" onclick="add('${w}')">${w}</div>`).join(''); } }
-        function add(w) { let i = document.getElementById('main-input'); i.value += (i.value ? " " : "") + w; }
+        function renderChips() {
+            for(let cat in beachVocab) {
+                document.getElementById('row-' + cat).innerHTML = beachVocab[cat].map(w => `<div class="chip" onclick="add('${w}')">${w}</div>`).join('');
+            }
+        }
 
-        function process() {
-            let val = document.getElementById('main-input').value.trim();
+        function add(w) { document.getElementById('words-in').value += (document.getElementById('words-in').value ? " " : "") + w; }
+
+        function sendMsg() {
+            const val = document.getElementById('words-in').value;
             if(!val) return;
-            
-            let translation = val.toLowerCase();
-            for(let eng in taxiBrain) { if(translation.includes(eng)) { translation = translation.replace(new RegExp(eng, 'g'), `<b>${taxiBrain[eng]}</b>`); } }
-
             let chat = document.getElementById('chat');
-            chat.innerHTML += `<div class="user msg">${val}</div>`;
-            coins += 150;
-            updateUI();
+            chat.innerHTML += `<div class="msg user">${val}</div>`;
+            
+            let res = val.toLowerCase();
+            for(let k in brain) { if(res.includes(k)) res = res.replace(k, `<b>${brain[k]}</b>`); }
 
             setTimeout(() => {
-                chat.innerHTML += `<div class="bot bubble"><b>Mestre Candongueiro:</b><br>${translation}<br><div style="color:var(--gold); font-size:10px; margin-top:5px;">+150 Kz EARNED!</div></div>`;
+                chat.innerHTML += `<div class="msg bot"><b>Beach Mestre:</b><br>${res}<br><small style="color:var(--gold)">+200 Kz</small></div>`;
+                coins += 200;
+                document.getElementById('app-coins').innerText = coins;
                 chat.scrollTop = chat.scrollHeight;
                 speak(val);
             }, 600);
-            document.getElementById('main-input').value = "";
+            document.getElementById('words-in').value = "";
         }
 
-        function updateUI() { 
-            document.getElementById('coins').innerText = coins; 
-            document.getElementById('board-coins').innerText = coins;
+        function exitToHome() {
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('home-screen').style.display = 'flex';
+            document.getElementById('home-coins').innerText = coins;
         }
+
         function speak(t) { window.speechSynthesis.cancel(); let m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; window.speechSynthesis.speak(m); }
 
-        renderChips();
-        updateUI();
     </script>
 </body>
 </html>
