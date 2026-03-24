@@ -1,62 +1,79 @@
-<script>
-    // Our Core 50 Dictionary (English to Portuguese)
-    const dictionary = {
-        "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
-        "have": "ter", "i": "eu", "it": "isto", "for": "por", "you": "você",
-        "with": "com", "on": "em", "do": "fazer", "say": "dizer", "this": "este"
-    };
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angola English Teacher</title>
+    <style>
+        body { background-color: #1a1a1a; color: white; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; padding: 10px; box-sizing: border-box; }
+        #chat-container { flex-grow: 1; border: 2px solid #ffd700; border-radius: 15px; padding: 15px; overflow-y: auto; margin-bottom: 10px; background: #252525; }
+        .bot-msg { color: #00ffcc; margin-bottom: 10px; line-height: 1.4; }
+        .user-msg { color: #ffffff; font-weight: bold; margin-bottom: 10px; text-align: right; }
+        .input-area { display: flex; gap: 10px; padding-bottom: 10px; }
+        input { flex-grow: 1; padding: 15px; border-radius: 10px; border: none; font-size: 16px; }
+        button { padding: 15px 25px; background: #ffd700; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
 
-    // Function to make the Bot Speak with an American accent
-    function speak(text) {
-        const message = new SpeechSynthesisUtterance();
-        message.text = text;
-        
-        // Find an American English voice
-        const voices = window.speechSynthesis.getVoices();
-        const americanVoice = voices.find(voice => voice.lang === 'en-US');
-        
-        if (americanVoice) {
-            message.voice = americanVoice;
-        }
-        
-        message.rate = 0.9; // Slightly slower so it's easier to learn
-        message.pitch = 1.0;
-        window.speechSynthesis.speak(message);
-    }
+    <h2 style="text-align: center; color: #ffd700;">American Teacher 🇺🇸</h2>
+    
+    <div id="chat-container">
+        <div class="bot-msg">Teacher: Hello! I am your American teacher. Escreve algo em Inglês para começarmos!</div>
+    </div>
 
-    function sendMessage() {
-        const input = document.getElementById("userInput");
-        const container = document.getElementById("chat-container");
-        const text = input.value.trim().toLowerCase();
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Type here...">
+        <button onclick="sendMessage()">SEND</button>
+    </div>
 
-        if (text === "") return;
+    <script>
+        const dictionary = {
+            "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
+            "a": "um/uma", "in": "em", "that": "que", "have": "ter", "i": "eu",
+            "it": "isto", "for": "por", "not": "não", "on": "sobre", "with": "com"
+        };
 
-        // Show User Message
-        container.innerHTML += `<div class="user-msg">Tu: ${text}</div>`;
-
-        // AI Logic: Check for words
-        let foundWords = [];
-        for (let word in dictionary) {
-            if (text.split(/\s+/).includes(word)) {
-                foundWords.push(`${word} (${dictionary[word]})`);
-            }
-        }
-
-        let responseText = "";
-        if (foundWords.length > 0) {
-            responseText = "Great! You used: " + foundWords.join(", ");
-        } else {
-            responseText = "Try using common words like 'I' or 'have'.";
+        function speak(text) {
+            window.speechSynthesis.cancel(); // Stop any current speaking
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            msg.rate = 0.8; // Slow for learners
+            window.speechSynthesis.speak(msg);
         }
 
-        // Show Bot Response in UI
-        container.innerHTML += `<div class="bot-msg">Teacher: ${responseText}</div>`;
-        
-        // MAKE THE BOT TALK
-        speak(responseText);
+        function sendMessage() {
+            const input = document.getElementById("userInput");
+            const container = document.getElementById("chat-container");
+            const text = input.value.trim();
 
-        // Auto-scroll and clear
-        input.value = "";
-        container.scrollTop = container.scrollHeight;
-    }
-</script>
+            if (text === "") return;
+
+            // User side
+            container.innerHTML += `<div class="user-msg">${text}</div>`;
+
+            // Logic side
+            let words = text.toLowerCase().split(/\s+/);
+            let found = [];
+            
+            words.forEach(w => {
+                if(dictionary[w]) found.push(`${w} (${dictionary[w]})`);
+            });
+
+            let response = found.length > 0 
+                ? "Excellent! You used: " + found.join(", ")
+                : "Good job! Try to use 'I', 'have' or 'with'.";
+
+            // Bot side
+            container.innerHTML += `<div class="bot-msg">Teacher: ${response}</div>`;
+            
+            // Speak
+            speak(response);
+
+            // Cleanup
+            input.value = "";
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+</html>
