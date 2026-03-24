@@ -3,167 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - Palanca Negra</title>
+    <title>Mestre AI - Elite Edition</title>
     <style>
-        :root { --gold: #ffd700; --dark: #050505; --card: #1a1a1a; --accent: #00ffcc; }
-        * { box-sizing: border-box; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        :root { --gold: #ffd700; --dark: #050505; --neon: #00ffcc; --pink: #ff007f; --blue: #0077ff; }
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         body { background: var(--dark); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* LOGIN SCREEN - FIXED ANIMATION */
+        /* TOP NAV (STATS) */
+        .stats-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333; z-index: 100;
+        }
+        .stat-item { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+        .coin-icon { color: var(--gold); animation: pulse 1.5s infinite; }
+
+        /* LOGIN (UNCHANGED LOGIC, BETTER VISUALS) */
         #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 999; 
+            position: fixed; inset: 0; background: radial-gradient(circle at center, #111, #000);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
         }
+        .hide-login { transform: scale(1.5); opacity: 0; pointer-events: none; }
+
+        /* LESSON SELECTOR */
+        .lesson-tabs { display: flex; gap: 10px; margin-bottom: 10px; padding: 5px; overflow-x: auto; }
+        .tab { 
+            padding: 8px 20px; border-radius: 20px; background: #222; font-size: 12px; 
+            border: 1px solid #444; white-space: nowrap; cursor: pointer;
+        }
+        .tab.active { background: var(--blue); border-color: var(--neon); box-shadow: 0 0 10px var(--blue); }
+
+        /* APP LAYOUT */
+        #app-interface { display: flex; flex-direction: column; height: 100vh; padding: 10px; opacity: 0; }
+        .show-app { opacity: 1 !important; }
+
+        #chat { flex-grow: 1; border-radius: 25px; padding: 15px; overflow-y: auto; background: #0c0c0c; margin-bottom: 10px; border: 1px solid #222; box-shadow: inset 0 0 20px #000; }
         
-        /* This class triggers when logging in */
-        .hide-login { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+        .bot-msg { display: flex; gap: 12px; margin-bottom: 20px; }
+        .mascot { font-size: 35px; filter: drop-shadow(0 0 5px var(--gold)); }
+        .bubble { background: #1a1a1a; padding: 15px; border-radius: 20px; border: 1px solid #333; line-height: 1.5; position: relative; }
+        .bubble::before { content: ''; position: absolute; left: -8px; top: 15px; border-style: solid; border-width: 8px 8px 8px 0; border-color: transparent #333 transparent transparent; }
 
-        .palanca-logo {
-            font-size: 80px; margin-bottom: 10px; filter: drop-shadow(0 0 15px var(--gold));
-            animation: bounce 2s infinite ease-in-out;
+        /* CHIP STYLING */
+        .chip-area { background: #111; border-radius: 20px; padding: 15px; border: 1px solid #222; }
+        .chip { 
+            background: linear-gradient(145deg, #222, #333); padding: 12px 20px; border-radius: 15px; 
+            font-size: 14px; border: 1px solid #444; color: #fff; cursor: pointer; display: inline-block; margin: 4px;
         }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .chip:active { transform: scale(0.9) translateY(5px); background: var(--gold); color: #000; }
 
-        .login-box {
-            width: 85%; max-width: 350px; background: rgba(255,255,255,0.05);
-            padding: 30px; border-radius: 25px; border: 1px solid rgba(255,215,0,0.3);
-            backdrop-filter: blur(15px); text-align: center;
-        }
-        input { 
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; 
-            border: 1px solid #333; background: #000; color: white; outline: none; font-size: 16px;
-        }
-        input:focus { border-color: var(--gold); }
+        .controls { display: flex; gap: 10px; padding: 10px 0; }
+        input { flex: 1; padding: 18px; border-radius: 20px; border: 1px solid #333; background: #000; color: #fff; outline: none; font-size: 16px; }
+        #send-btn { background: var(--gold); border: none; border-radius: 20px; padding: 0 30px; font-weight: 900; box-shadow: 0 5px 15px rgba(255,215,0,0.3); }
 
-        /* MAIN APP LAYOUT */
-        #app-interface { 
-            display: flex; flex-direction: column; height: 100vh; padding: 15px; 
-            opacity: 0; transform: scale(0.9); 
-        }
-        .show-app { opacity: 1 !important; transform: scale(1) !important; }
-
-        #chat { flex-grow: 1; border-radius: 20px; padding: 15px; overflow-y: auto; background: #0c0c0c; border: 1px solid #222; margin-bottom: 10px; }
-        
-        .bot-msg { display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-start; animation: slideRight 0.3s forwards; }
-        .mascot-icon { font-size: 30px; background: #222; padding: 5px; border-radius: 50%; border: 1px solid var(--gold); min-width: 45px; text-align: center; }
-        .bubble { background: #1a1a1a; padding: 12px; border-radius: 0 15px 15px 15px; border: 1px solid #333; max-width: 80%; }
-        
-        .user-msg { text-align: right; color: var(--gold); margin-bottom: 15px; font-weight: bold; animation: slideLeft 0.3s forwards; }
-
-        .row-label { font-size: 10px; color: #666; text-transform: uppercase; margin: 5px 0; letter-spacing: 1px; }
-        .chip-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .chip-container::-webkit-scrollbar { display: none; }
-        .chip { background: #222; padding: 10px 18px; border-radius: 12px; font-size: 14px; white-space: nowrap; border: 1px solid #444; cursor: pointer; }
-        .chip:active { background: var(--gold); color: #000; }
-
-        .btn-gold { background: var(--gold); color: black; border: none; padding: 15px; border-radius: 15px; font-weight: 900; width: 100%; cursor: pointer; font-size: 16px; }
-
-        @keyframes slideRight { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideLeft { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
+    <div class="stats-bar">
+        <div class="stat-item">🦌 <span id="user-display">Mestre</span></div>
+        <div class="stat-item"><span class="coin-icon">💰</span> <span id="coins">0</span> Kz</div>
+        <div id="badge" class="stat-item" style="color: var(--neon); font-size: 10px;">🔰 NOVICE</div>
+    </div>
+
     <div id="login-screen">
-        <div class="palanca-logo">🦌</div>
-        <h2 style="color: var(--gold); letter-spacing: 2px; margin-bottom: 5px;">PALANCA MESTRE</h2>
-        <p style="color: #888; margin-bottom: 20px; font-size: 12px;">UBER ENGLISH LEARNING 🇦🇴</p>
-        <div class="login-box">
-            <input type="text" id="username" placeholder="Teu Nome (Your Name)">
-            <input type="password" placeholder="Password">
-            <button class="btn-gold" onclick="login()">ENTRAR / LOGIN</button>
+        <div class="mascot" style="font-size: 100px;">🦌</div>
+        <h1 style="color: var(--gold); margin: 0;">MESTRE AI</h1>
+        <p style="color: #666; margin-bottom: 20px;">Elite Language Training</p>
+        <div style="width: 80%; max-width: 300px;">
+            <input type="text" id="username" placeholder="Teu nome...">
+            <button onclick="login()" style="width:100%; padding:15px; border-radius:15px; background:var(--gold); border:none; font-weight:bold; margin-top:10px;">START MISSION</button>
         </div>
     </div>
 
     <div id="app-interface">
+        <div class="lesson-tabs">
+            <div class="tab active" onclick="setTimeline('present', this)">PRESENT (Am/Is/Are)</div>
+            <div class="tab" onclick="setTimeline('past', this)">PAST (Was/Were)</div>
+            <div class="tab" onclick="setTimeline('future', this)">FUTURE (Will be)</div>
+        </div>
+
         <div id="chat">
             <div class="bot-msg">
-                <div class="mascot-icon">🦌</div>
-                <div class="bubble"><b>Mestre Palanca:</b> Olá! Escolha os blocos para começar a falar Inglês!</div>
+                <div class="mascot">🦌</div>
+                <div class="bubble"><b>Mestre:</b> Olá! Vamos dominar o verbo "To Be". Seleciona o tempo verbal acima e monta a tua frase!</div>
             </div>
         </div>
 
-        <div style="background: #111; border-radius: 20px; padding: 10px; margin-bottom: 10px; border: 1px solid #333;">
-            <div id="chip-area"></div>
+        <div class="chip-area">
+            <div id="who-row"></div>
+            <div id="verb-row" style="margin-top:10px;"></div>
+            <div id="object-row" style="margin-top:10px;"></div>
         </div>
 
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="words" placeholder="Sua frase aqui..." readonly style="margin:0; background: #000;">
-            <button onclick="process()" style="background:var(--gold); border:none; border-radius:12px; padding:0 25px; font-weight:bold; color: black;">SEND</button>
+        <div class="controls">
+            <input type="text" id="words" placeholder="..." readonly>
+            <button id="send-btn" onclick="send()">SEND</button>
         </div>
     </div>
 
     <script>
-        // Real Translation Dictionary
-        const dictionary = {
-            "I": "Eu", "You": "Tu", "He": "Ele", "She": "Ela", "We": "Nós",
-            "am": "sou/estou", "want": "quero", "need": "preciso de", "go": "vou", "to": "para",
-            "happy": "feliz", "water": "água", "work": "trabalho", "school": "escola",
-            "hungry": "com fome", "now": "agora"
-        };
+        let wallet = 0;
+        let currentTimeline = 'present';
 
-        const wordCategories = {
-            "Who (Quem)": ["I", "You", "He", "She", "We"],
-            "Action (Ação)": ["am", "want", "need", "go", "to"],
-            "Object/State": ["happy", "water", "work", "school", "hungry", "now"]
+        const data = {
+            who: ["I", "You", "He", "She", "It", "We", "They"],
+            verbs: {
+                present: ["am", "are", "is"],
+                past: ["was", "were"],
+                future: ["will be"]
+            },
+            objects: ["happy", "hungry", "at home", "working", "learning", "late"],
+            translations: {
+                "I am": "Eu sou/estou", "You are": "Tu és/estás", "He is": "Ele é/está",
+                "I was": "Eu era/estava", "You were": "Tu eras/estavas",
+                "I will be": "Eu serei/estarei", "They will be": "Eles serão/estarão"
+            }
         };
 
         function login() {
-            const user = document.getElementById('username').value || "Estudante";
-            // 1. Hide Login Screen
+            let name = document.getElementById('username').value || "Recruta";
+            document.getElementById('user-display').innerText = name;
             document.getElementById('login-screen').classList.add('hide-login');
-            // 2. Show App Interface
             document.getElementById('app-interface').classList.add('show-app');
-            
+            loadChips();
+        }
+
+        function setTimeline(time, el) {
+            currentTimeline = time;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
             loadChips();
         }
 
         function loadChips() {
-            const area = document.getElementById('chip-area');
-            area.innerHTML = ""; 
-            for (let cat in wordCategories) {
-                area.innerHTML += `<div class="row-label">${cat}</div>`;
-                let row = document.createElement('div');
-                row.className = "chip-container";
-                wordCategories[cat].forEach(w => {
-                    row.innerHTML += `<div class="chip" onclick="add('${w}')">${w}</div>`;
-                });
-                area.appendChild(row);
-            }
+            const whoRow = document.getElementById('who-row');
+            const verbRow = document.getElementById('verb-row');
+            const objRow = document.getElementById('object-row');
+
+            whoRow.innerHTML = data.who.map(w => `<div class="chip" onclick="add('${w}')">${w}</div>`).join('');
+            verbRow.innerHTML = data.verbs[currentTimeline].map(v => `<div class="chip" style="border-color:var(--neon)" onclick="add('${v}')">${v}</div>`).join('');
+            objRow.innerHTML = data.objects.map(o => `<div class="chip" onclick="add('${o}')">${o}</div>`).join('');
         }
 
         function add(w) { 
-            const input = document.getElementById('words');
+            let input = document.getElementById('words');
             input.value += (input.value ? " " : "") + w; 
         }
 
-        function process() {
-            let english = document.getElementById('words').value.trim();
-            if(!english) return;
+        function send() {
+            let eng = document.getElementById('words').value.trim();
+            if(!eng) return;
 
-            // Simple Translator Logic
-            let wordsArray = english.split(" ");
-            let portugueseArray = wordsArray.map(w => dictionary[w] || w);
-            let portuguese = portugueseArray.join(" ");
+            // Simple translation engine logic
+            let pt = "Analizando...";
+            for(let key in data.translations) {
+                if(eng.startsWith(key)) {
+                    pt = eng.replace(key, data.translations[key]);
+                }
+            }
+
+            // Reward System
+            wallet += 50;
+            document.getElementById('coins').innerText = wallet;
+            if(wallet > 200) document.getElementById('badge').innerText = "⭐ EXPLORER";
 
             let chat = document.getElementById('chat');
-            chat.innerHTML += `<div class="user-msg">${english}</div>`;
+            chat.innerHTML += `<div style="text-align:right; color:var(--gold); margin-bottom:20px; font-weight:bold;">${eng}</div>`;
             
             setTimeout(() => {
                 chat.innerHTML += `
                     <div class="bot-msg">
-                        <div class="mascot-icon">🦌</div>
+                        <div class="mascot">🦌</div>
                         <div class="bubble">
-                            <b style="color:var(--gold)">Tradução:</b><br>${portuguese}<br>
-                            <hr style="border:0; border-top:1px solid #333; margin:8px 0;">
-                            <small style="color:var(--accent)">🔊 Speaking English now...</small>
+                            <b style="color:var(--neon)">Mestre:</b> ${pt}<br>
+                            <span style="color:var(--gold); font-size:10px;">+50 Kz EARNED!</span>
                         </div>
                     </div>`;
                 chat.scrollTop = chat.scrollHeight;
-                speak(english);
-            }, 500);
+                speak(eng);
+            }, 600);
 
             document.getElementById('words').value = "";
         }
@@ -172,7 +192,6 @@
             window.speechSynthesis.cancel();
             let m = new SpeechSynthesisUtterance(t);
             m.lang = 'en-US';
-            m.rate = 0.8;
             window.speechSynthesis.speak(m);
         }
     </script>
