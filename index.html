@@ -7,59 +7,55 @@
     <style>
         body { background: #121212; color: white; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
         #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; }
-        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; }
+        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; border-left: 3px solid #ffd700; padding-left: 10px; }
         .user { color: #ffffff; margin-bottom: 15px; text-align: right; font-weight: bold; }
-        .input-box { display: flex; gap: 5px; }
+        .input-box { display: flex; gap: 5px; padding-bottom: 10px; }
         input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; }
-        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; }
+        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; min-width: 80px; }
     </style>
 </head>
 <body>
 
-    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Professor Americano 🇦🇴🇺🇸</h3>
+    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Mestre Americano 🇦🇴🇺🇸</h3>
     
     <div id="chat">
-        <div class="bot">Teacher: Hello! Let's learn English! / Olá! Vamos aprender Inglês!</div>
+        <div class="bot">Teacher: Hello! I am ready to teach. Let's practice the 50 core words! / Olá! Estou pronto para ensinar. Vamos praticar!</div>
     </div>
 
     <div class="input-box">
-        <input type="text" id="words" placeholder="Escreva aqui...">
+        <input type="text" id="words" placeholder="Escreva em Inglês...">
         <button onclick="falarTudo()">SEND</button>
     </div>
 
     <script>
-      var dicionario = {
-            // High Frequency
-            "the": "o ou a", "be": "ser ou estar", "to": "para", "of": "de", "and": "e",
-            "a": "um ou uma", "in": "em ou dentro", "that": "que", "have": "ter", "i": "eu",
-            "it": "isto", "for": "por", "not": "não", "on": "sobre ou em", "with": "com",
-            "he": "ele", "as": "como", "you": "você ou tu", "do": "fazer", "at": "no ou na",
-            "this": "este ou esta", "but": "mas", "his": "dele", "by": "por", "from": "de ou desde",
+        var dicionario = {
+            "the": "o ou a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
+            "a": "um", "in": "em", "that": "que", "have": "ter", "i": "eu",
+            "it": "isto", "for": "por", "not": "não", "on": "sobre", "with": "com",
+            "he": "ele", "as": "como", "you": "você", "do": "fazer", "at": "em",
+            "this": "este", "but": "mas", "his": "dele", "by": "por", "from": "de",
             "they": "eles", "we": "nós", "say": "dizer", "her": "dela", "she": "ela",
-            "or": "ou", "an": "um ou uma", "will": "será ou vou", "my": "meu ou minha", "one": "um",
-            "all": "tudo ou todos", "would": "seria", "there": "lá", "their": "deles", "what": "o que",
+            "or": "ou", "an": "um", "will": "será", "my": "meu", "one": "um",
+            "all": "tudo", "would": "seria", "there": "lá", "their": "deles", "what": "o que",
             "so": "então", "up": "cima", "out": "fora", "if": "se", "about": "sobre",
-            "who": "quem", "get": "pegar ou obter", "which": "qual", "go": "ir", "me": "me ou mim",
-            // Bonus: Action Verbs for your students
+            "who": "quem", "get": "pegar", "which": "qual", "go": "ir", "me": "mim",
             "eat": "comer", "drink": "beber", "sleep": "dormir", "run": "correr", "walk": "andar",
             "work": "trabalhar", "speak": "falar", "learn": "aprender", "write": "escrever"
-            // Bonus    
-            "i": "Eu", "have": "Tenho", "the": "O ou A", "and": "E", "you": "Você",
-            "is": "É", "my": "Meu", "book": "Livro", "water": "Água", "friend": "Amigo"
         };
 
         function falarTudo() {
             var campo = document.getElementById("words");
             var tela = document.getElementById("chat");
-            var texto = campo.value.trim().toLowerCase();
+            var textoOriginal = campo.value.trim();
+            var textoLimpo = textoOriginal.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 
-            if (texto === "") return;
+            if (textoLimpo === "") return;
 
-            // 1. Show User Input
-            tela.innerHTML += "<div class='user'>Tu: " + texto + "</div>";
+            // 1. Show User Text
+            tela.innerHTML += "<div class='user'>" + textoOriginal + "</div>";
 
-            // 2. Teacher Logic
-            var palavras = texto.split(" ");
+            // 2. Logic
+            var palavras = textoLimpo.split(" ");
             var traducao = "";
             for (var i = 0; i < palavras.length; i++) {
                 var p = palavras[i];
@@ -68,25 +64,26 @@
                 }
             }
 
-            var respostaEN = "Great job!";
-            var respostaPT = "Muito bem! " + traducao;
+            var respostaEN = "Excellent!";
+            var respostaPT = (traducao !== "") ? "Muito bem! " + traducao : "Eu ouvi! Tente usar palavras como 'I', 'have' ou 'work'.";
 
             // 3. Show Bot Response
-            tela.innerHTML += "<div class='bot'>Teacher: " + respostaEN + "<br>" + respostaPT + "</div>";
+            tela.innerHTML += "<div class='bot'><b>Teacher:</b> " + respostaEN + "<br>" + respostaPT + "</div>";
 
-            // 4. SPEAK (English First)
-            window.speechSynthesis.cancel();
-            
-            var msgEN = new SpeechSynthesisUtterance(respostaEN);
-            msgEN.lang = 'en-US';
-            msgEN.rate = 0.8;
-            window.speechSynthesis.speak(msgEN);
+            // 4. Voice (Clear old, start new)
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                var msgEN = new SpeechSynthesisUtterance(respostaEN);
+                msgEN.lang = 'en-US';
+                msgEN.rate = 0.8;
+                window.speechSynthesis.speak(msgEN);
 
-            // 5. SPEAK (Portuguese Second)
-            var msgPT = new SpeechSynthesisUtterance(respostaPT);
-            msgPT.lang = 'pt-PT';
-            msgPT.rate = 1.0;
-            window.speechSynthesis.speak(msgPT);
+                var msgPT = new SpeechSynthesisUtterance(respostaPT);
+                msgPT.lang = 'pt-PT';
+                msgPT.rate = 1.0;
+                window.speechSynthesis.speak(msgPT);
+            }
 
             // Cleanup
             campo.value = "";
