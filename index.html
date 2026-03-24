@@ -1,77 +1,82 @@
-<script>
-    // This is our "Smart Brain" - we can keep adding thousands of words here!
-    var dicionario = {
-        "the": "o ou a", "be": "ser ou estar", "to": "para", "of": "de", "and": "e",
-        "a": "um", "in": "dentro de", "that": "que", "have": "ter", "i": "eu",
-        "it": "isto", "for": "por", "not": "não", "on": "sobre", "with": "com",
-        "he": "ele", "she": "ela", "you": "você", "do": "fazer", "is": "é",
-        "we": "nós", "they": "eles", "book": "livro", "water": "água", "friend": "amigo"
-    };
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Angola English Teacher</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
+        #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; }
+        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; }
+        .user { color: #ffffff; margin-bottom: 15px; text-align: right; font-weight: bold; }
+        .input-box { display: flex; gap: 5px; }
+        input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; }
+        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; }
+    </style>
+</head>
+<body>
 
-    // This function handles the "Switching" of voices
-    function falar(texto, lingua) {
-        var msg = new SpeechSynthesisUtterance(texto);
-        
-        if (lingua === "en") {
-            msg.lang = 'en-US';
-            msg.rate = 0.8; // American Teacher speed
-        } else {
-            msg.lang = 'pt-PT'; // Portuguese (European/Angolan style)
-            msg.rate = 1.0; 
-        }
-        
-        window.speechSynthesis.speak(msg);
-    }
+    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Professor Americano 🇦🇴🇺🇸</h3>
+    
+    <div id="chat">
+        <div class="bot">Teacher: Hello! Let's learn English! / Olá! Vamos aprender Inglês!</div>
+    </div>
 
-    function processar() {
-        var campo = document.getElementById("words");
-        var tela = document.getElementById("chat");
-        var inputOriginal = campo.value.trim();
-        var texto = inputOriginal.toLowerCase();
+    <div class="input-box">
+        <input type="text" id="words" placeholder="Escreva aqui...">
+        <button onclick="falarTudo()">SEND</button>
+    </div>
 
-        if (texto === "") return;
+    <script>
+        var dicionario = {
+            "i": "Eu", "have": "Tenho", "the": "O ou A", "and": "E", "you": "Você",
+            "is": "É", "my": "Meu", "book": "Livro", "water": "Água", "friend": "Amigo"
+        };
 
-        // 1. Show User Input
-        tela.innerHTML += "<div class='user'>Tu: " + inputOriginal + "</div>";
+        function falarTudo() {
+            var campo = document.getElementById("words");
+            var tela = document.getElementById("chat");
+            var texto = campo.value.trim().toLowerCase();
 
-        // 2. Clear old speech
-        window.speechSynthesis.cancel();
+            if (texto === "") return;
 
-        // 3. LOGIC: Is the user asking "What is...?" (O que é...?)
-        var respostaEN = "";
-        var respostaPT = "";
+            // 1. Show User Input
+            tela.innerHTML += "<div class='user'>Tu: " + texto + "</div>";
 
-        var palavras = texto.split(" ");
-        var encontrados = [];
-
-        for (var i = 0; i < palavras.length; i++) {
-            var p = palavras[i];
-            if (dicionario[p]) {
-                encontrados.push(p.toUpperCase() + " significa " + dicionario[p]);
+            // 2. Teacher Logic
+            var palavras = texto.split(" ");
+            var traducao = "";
+            for (var i = 0; i < palavras.length; i++) {
+                var p = palavras[i];
+                if (dicionario[p]) {
+                    traducao += p.toUpperCase() + " significa " + dicionario[p] + ". ";
+                }
             }
+
+            var respostaEN = "Great job!";
+            var respostaPT = "Muito bem! " + traducao;
+
+            // 3. Show Bot Response
+            tela.innerHTML += "<div class='bot'>Teacher: " + respostaEN + "<br>" + respostaPT + "</div>";
+
+            // 4. SPEAK (English First)
+            window.speechSynthesis.cancel();
+            
+            var msgEN = new SpeechSynthesisUtterance(respostaEN);
+            msgEN.lang = 'en-US';
+            msgEN.rate = 0.8;
+            window.speechSynthesis.speak(msgEN);
+
+            // 5. SPEAK (Portuguese Second)
+            var msgPT = new SpeechSynthesisUtterance(respostaPT);
+            msgPT.lang = 'pt-PT';
+            msgPT.rate = 1.0;
+            window.speechSynthesis.speak(msgPT);
+
+            // Cleanup
+            campo.value = "";
+            tela.scrollTop = tela.scrollHeight;
         }
-
-        if (encontrados.length > 0) {
-            respostaEN = "Great job!";
-            respostaPT = "Muito bem! " + encontrados.join(". ");
-        } else {
-            respostaEN = "I am listening.";
-            respostaPT = "Eu estou a ouvir. Tenta usar palavras básicas.";
-        }
-
-        // 4. DISPLAY & SPEAK
-        tela.innerHTML += "<div class='bot'>Teacher: " + respostaEN + "<br><small>" + respostaPT + "</small></div>";
-
-        // Speak English First, then Portuguese!
-        falar(respostaEN, "en");
-        
-        // Wait a small moment then speak Portuguese
-        setTimeout(function() {
-            falar(respostaPT, "pt");
-        }, 1500);
-
-        // Cleanup
-        campo.value = "";
-        tela.scrollTop = tela.scrollHeight;
-    }
-</script>
+    </script>
+</body>
+</html>
