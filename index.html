@@ -1,20 +1,69 @@
-// The 50 core words
-const core50 = [
-  "the", "be", "to", "of", "and", "a", "in", "that", "have", "i",
-  "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
-  "this", "but", "his", "by", "from", "they", "we", "say", "her", "she",
-  "or", "an", "will", "my", "one", "all", "would", "there", "their", "what",
-  "so", "up", "out", "if", "about", "who", "get", "which", "go", "me"
-];
+<!DOCTYPE html>
+<html lang="pt-ao">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angola English AI</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; padding: 20px; }
+        #chat-container { border: 2px solid #ffd700; padding: 15px; border-radius: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+        input { width: 70%; padding: 10px; border-radius: 5px; border: none; }
+        button { width: 25%; padding: 10px; background: #ffd700; border: none; font-weight: bold; border-radius: 5px; }
+        .bot-msg { color: #00ffcc; margin: 5px 0; }
+        .user-msg { color: #ffffff; margin: 5px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
 
-// The function that runs when you hit "SEND"
-function teacherBot(userInput) {
-    const inputWords = userInput.toLowerCase().split(" ");
-    const found = core50.filter(word => inputWords.includes(word));
+    <h2>Teacher "Aula" 🇦🇴🇬🇧</h2>
+    <div id="chat-container">
+        <div class="bot-msg">Teacher: Olá! Escreve uma frase em Inglês para começar.</div>
+    </div>
 
-    if (found.length > 0) {
-        return "Great job! You used these core words: " + found.join(", ") + ".";
-    } else {
-        return "Good start! Try using common words like 'the', 'is', or 'and' to build a sentence.";
-    }
-}
+    <input type="text" id="userInput" placeholder="Escreva aqui...">
+    <button onclick="sendMessage()">SEND</button>
+
+    <script>
+        // Our Core 50 Dictionary
+        const dictionary = {
+            "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
+            "have": "ter", "i": "eu", "it": "isto", "for": "por", "you": "você"
+            // We will add the rest as we go!
+        };
+
+        function sendMessage() {
+            const input = document.getElementById("userInput");
+            const container = document.getElementById("chat-container");
+            const text = input.value.trim().toLowerCase();
+
+            if (text === "") return;
+
+            // Show User Message
+            container.innerHTML += `<div class="user-msg">Tu: ${text}</div>`;
+
+            // AI Logic: Check for words
+            let response = "Teacher: Nice! ";
+            let foundWords = [];
+
+            for (let word in dictionary) {
+                if (text.includes(word)) {
+                    foundWords.push(`${word} (${dictionary[word]})`);
+                }
+            }
+
+            if (foundWords.length > 0) {
+                response += "Usaste estas palavras: " + foundWords.join(", ");
+            } else {
+                response = "Teacher: Tenta usar palavras simples como 'I', 'Have' ou 'The'.";
+            }
+
+            // Show Bot Response
+            container.innerHTML += `<div class="bot-msg">${response}</div>`;
+            
+            // Auto-scroll and clear
+            input.value = "";
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+</html>
