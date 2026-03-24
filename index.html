@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola English Teacher</title>
+    <title>Angola English AI</title>
     <style>
         body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; overflow: hidden; }
         .stats { background: #202c33; padding: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; font-size: 0.8rem; }
@@ -20,12 +20,12 @@
 <body>
 
 <div class="stats">
-    <span>Lvl 1 Teacher 🇦🇴</span>
+    <span>Teacher Mode 🇦🇴</span>
     <span id="xp-tag">0 XP</span>
 </div>
 
 <div id="chat-box">
-    <div class="m bot"><b>System Reset!</b> The bot is stable. Type 'Ola' or 'Help' to test. Send me your <b>Verb to Be</b> lesson now!</div>
+    <div class="m bot"><b>100 Words Active!</b> I'm ready, brother. Test me with 'Ola', 'Family', or 'Fome'. I am waiting for your <b>Verb to Be</b> lesson!</div>
 </div>
 
 <div class="input-area">
@@ -36,18 +36,28 @@
 <script>
     let xp = 0;
 
-    // Simplified dictionary to prevent "White Screen"
-    const dictionary = {
-        "ola": "Hello!",
-        "bom dia": "Good morning",
-        "obrigado": "Thank you",
-        "fome": "Hungry",
-        "estamos juntos": "We are together",
-        "ajuda": "Help",
-        "sim": "Yes",
-        "nao": "No",
-        "por favor": "Please",
-        "mambo": "Thing / Situation"
+    // THE BRAIN - 100 MOST COMMON WORDS
+    const brain = {
+        "ola": "Hello!", "bom dia": "Good morning", "boa tarde": "Good afternoon", "boa noite": "Good night",
+        "obrigado": "Thank you", "por favor": "Please", "estamos juntos": "We are together", "mambo": "Thing",
+        "fome": "Hungry", "sede": "Thirsty", "ajuda": "Help", "sim": "Yes", "nao": "No", "quem": "Who",
+        "o que": "What", "onde": "Where", "quando": "When", "porque": "Why", "como": "How",
+        "eu": "I", "voce": "You", "ele": "He", "ela": "She", "nos": "We", "eles": "They",
+        "ser": "Be", "ter": "Have", "fazer": "Do", "dizer": "Say", "ir": "Go", "obter": "Get",
+        "ver": "See", "saber": "Know", "pensar": "Think", "vir": "Come", "querer": "Want",
+        "tempo": "Time", "ano": "Year", "dia": "Day", "semana": "Week", "hoje": "Today",
+        "ontem": "Yesterday", "amanha": "Tomorrow", "casa": "Home", "escola": "School",
+        "trabalho": "Work", "cidade": "City", "pais": "Country", "mundo": "World",
+        "familia": "Family", "amigo": "Friend", "mulher": "Woman", "homem": "Man",
+        "crianca": "Child", "vida": "Life", "povo": "People", "coisa": "Thing",
+        "bom": "Good", "mau": "Bad", "feliz": "Happy", "triste", "Sad", "grande": "Big",
+        "pequeno": "Small", "muito": "Very", "mais": "More", "menos": "Less",
+        "agua": "Water", "comida": "Food", "dinheiro": "Money", "carro": "Car",
+        "livro": "Book", "nome": "Name", "lugar": "Place", "parte": "Part",
+        "novo": "New", "velho": "Old", "primeiro": "First", "ultimo": "Last",
+        "aberto": "Open", "fechado": "Closed", "frio": "Cold", "quente": "Hot",
+        "amor": "Love", "paz": "Peace", "de": "Of", "e": "And", "com": "With",
+        "para": "To", "em": "In", "sobre": "On", "mas": "But"
     };
 
     function send() {
@@ -59,7 +69,7 @@
         input.value = "";
 
         setTimeout(() => {
-            let response = dictionary[val];
+            let response = brain[val];
 
             if(response) {
                 addMsg("🇺🇸 <b>" + response + "</b>", 'bot');
@@ -67,18 +77,16 @@
                 xp += 10;
                 document.getElementById('xp-tag').innerText = xp + " XP";
             } else {
-                addMsg("I'm ready for the lesson! Send me the Verb to Be text.", 'bot');
+                addMsg("I'm learning this! Send the Verb to Be lesson so I can get smarter.", 'bot');
             }
-        }, 500);
+        }, 400);
     }
 
     function addMsg(t, s) {
         let d = document.createElement('div');
-        d.className = 'm ' + s;
-        d.innerHTML = t;
+        d.className = 'm ' + s; d.innerHTML = t;
         let box = document.getElementById('chat-box');
-        box.appendChild(d);
-        box.scrollTop = box.scrollHeight;
+        box.appendChild(d); box.scrollTop = box.scrollHeight;
     }
 
     function speak(t) {
@@ -87,6 +95,5 @@
         window.speechSynthesis.speak(s);
     }
 </script>
-
 </body>
 </html>
