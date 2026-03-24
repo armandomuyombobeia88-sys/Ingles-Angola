@@ -1,63 +1,91 @@
-<script>
-    // Expanded 50 Core Words (English to Portuguese)
-    const dicionario = {
-        "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
-        "a": "um/uma", "in": "em", "that": "que", "have": "ter", "i": "eu",
-        "it": "isto", "for": "por", "not": "não", "on": "em/sobre", "with": "com",
-        "he": "ele", "as": "como", "you": "você", "do": "fazer", "at": "em",
-        "this": "este", "but": "mas", "his": "dele", "by": "por", "from": "de",
-        "they": "eles", "we": "nós", "say": "dizer", "her": "dela", "she": "ela",
-        "or": "ou", "an": "um/uma", "will": "será", "my": "meu", "one": "um",
-        "all": "tudo", "would": "seria", "there": "lá", "their": "deles", "what": "o que",
-        "so": "então", "up": "cima", "out": "fora", "if": "se", "about": "sobre",
-        "who": "quem", "get": "pegar", "which": "qual", "go": "ir", "me": "me/mim"
-    };
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Angola English Teacher</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
+        #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; }
+        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; }
+        .user { color: #ffffff; margin-bottom: 15px; text-align: right; font-weight: bold; }
+        .input-box { display: flex; gap: 5px; }
+        input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; }
+        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; }
+    </style>
+</head>
+<body>
 
-    function falar() {
-        var campo = document.getElementById("words");
-        var tela = document.getElementById("chat");
-        var texto = campo.value.trim().toLowerCase();
+    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Mestre Americano 🇦🇴🇺🇸</h3>
+    
+    <div id="chat">
+        <div class="bot">Teacher: Hello! I am your American teacher. Let's learn!</div>
+    </div>
 
-        if (texto === "") return;
+    <div class="input-box">
+        <input type="text" id="words" placeholder="Escreva aqui...">
+        <button onclick="falar()">SEND</button>
+    </div>
 
-        // User side
-        tela.innerHTML += "<div class='user'>Tu: " + texto + "</div>";
+    <script>
+        // The Core 50 Dictionary
+        var dicionario = {
+            "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
+            "a": "um/uma", "in": "em", "that": "que", "have": "ter", "i": "eu",
+            "it": "isto", "for": "por", "not": "não", "on": "em/sobre", "with": "com",
+            "he": "ele", "as": "como", "you": "você", "do": "fazer", "at": "em",
+            "this": "este", "but": "mas", "his": "dele", "by": "por", "from": "de",
+            "they": "eles", "we": "nós", "say": "dizer", "her": "dela", "she": "ela",
+            "or": "ou", "an": "um/uma", "will": "será", "my": "meu", "one": "um",
+            "all": "tudo", "would": "seria", "there": "lá", "their": "deles", "what": "o que",
+            "so": "então", "up": "cima", "out": "fora", "if": "se", "about": "sobre",
+            "who": "quem", "get": "pegar", "which": "qual", "go": "ir", "me": "me/mim"
+        };
 
-        // Teacher Logic
-        var lista = texto.split(/\s+/);
-        var encontrados = [];
-        lista.forEach(function(p) {
-            if (dicionario[p]) encontrados.push(p.toUpperCase() + " (" + dicionario[p] + ")");
-        });
+        function falar() {
+            var campo = document.getElementById("words");
+            var tela = document.getElementById("chat");
+            var texto = campo.value.trim().toLowerCase();
 
-        var resposta = encontrados.length > 0 
-            ? "Excellent! You used: " + encontrados.join(", ") 
-            : "I see! Try to use 'I', 'have', or 'you'. For example: 'I have a book'.";
+            if (texto === "") return;
 
-        // Bot side
-        tela.innerHTML += "<div class='bot'>Teacher: " + resposta + "</div>";
+            // Show user text
+            tela.innerHTML += "<div class='user'>Tu: " + texto + "</div>";
 
-        // --- THE NEW VOICE LOGIC ---
-        window.speechSynthesis.cancel(); // Clear any old speech
-        var msg = new SpeechSynthesisUtterance(resposta);
-        
-        // Find American Voice
-        var voices = window.speechSynthesis.getVoices();
-        var american = voices.find(v => v.lang.includes('en-US'));
-        
-        if (american) {
-            msg.voice = american;
+            // Logic: find English words and show Portuguese meaning
+            var palavrasInput = texto.split(" ");
+            var encontrados = [];
+            
+            for (var i = 0; i < palavrasInput.length; i++) {
+                var p = palavrasInput[i];
+                if (dicionario[p]) {
+                    encontrados.push(p.toUpperCase() + " (" + dicionario[p] + ")");
+                }
+            }
+
+            var resposta = "";
+            if (encontrados.length > 0) {
+                resposta = "Great! You used: " + encontrados.join(", ");
+            } else {
+                resposta = "I see! Try to use 'I', 'have', or 'the'. For example: 'I have a book'.";
+            }
+
+            // Show teacher response
+            tela.innerHTML += "<div class='bot'>Teacher: " + resposta + "</div>";
+
+            // --- AMERICAN VOICE (SAFE FOR OLD PHONES) ---
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                var msg = new SpeechSynthesisUtterance(resposta);
+                msg.lang = 'en-US';
+                msg.rate = 0.8;
+                window.speechSynthesis.speak(msg);
+            }
+
+            // Reset
+            campo.value = "";
+            tela.scrollTop = tela.scrollHeight;
         }
-
-        msg.lang = 'en-US';
-        msg.rate = 0.85; // Natural pace for learning
-        msg.pitch = 1.0; // Normal human pitch
-        msg.volume = 1.0; // Max volume
-
-        window.speechSynthesis.speak(msg);
-
-        // Cleanup
-        campo.value = "";
-        tela.scrollTop = tela.scrollHeight;
-    }
-</script>
+    </script>
+</body>
+</html>
