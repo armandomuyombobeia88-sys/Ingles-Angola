@@ -5,58 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mestre AI - Cinematic Elite</title>
     <style>
-        :root { --gold: #ffd700; --dark: #050505; --accent: #00ffcc; }
-        * { box-sizing: border-box; font-family: sans-serif; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        :root { --gold: #ffd700; --dark: #050505; --accent: #00ffcc; --red: #ff4444; }
+        * { box-sizing: border-box; font-family: sans-serif; transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* INTRO OVERLAY */
-        #intro-overlay {
-            position: fixed; inset: 0; z-index: 9999; background: #000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .intro-text { font-size: 14px; letter-spacing: 8px; color: var(--gold); text-transform: uppercase; }
-        .word-loader { font-size: 40px; font-weight: 900; margin-top: 20px; color: white; }
+        /* INTRO */
+        #intro-overlay { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .progress-bar { width: 200px; height: 2px; background: #222; margin-top: 40px; position: relative; }
         #p-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--gold); width: 0%; transition: width 4s linear; }
 
-        /* HOME MENU */
-        #home-menu {
-            display: none; height: 100vh; flex-direction: column;
-            background: radial-gradient(circle at top right, #1a1a00, #000);
-            padding: 40px 20px; text-align: center; opacity: 0;
-        }
-        .boss-card {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 30px; padding: 30px; margin-top: 50px;
-        }
-        .menu-btn {
-            width: 100%; padding: 18px; margin-top: 15px; border-radius: 15px;
-            border: none; font-weight: 900; font-size: 16px; cursor: pointer;
-        }
+        /* SCREENS */
+        #home-menu, #battle-screen { display: none; height: 100vh; flex-direction: column; padding: 40px 20px; text-align: center; position: fixed; inset: 0; }
+        #home-menu { background: radial-gradient(circle at top right, #1a1a00, #000); }
+        #battle-screen { background: #000; z-index: 100; justify-content: center; }
+
+        .boss-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 30px; padding: 25px; margin-top: 20px; }
+        input { width: 100%; padding: 18px; background: #111; border: 1px solid #333; color: white; border-radius: 15px; margin: 15px 0; font-size: 18px; text-align: center; outline: none; }
+        input:focus { border-color: var(--gold); }
+        
+        .menu-btn { width: 100%; padding: 18px; margin-top: 10px; border-radius: 15px; border: none; font-weight: 900; font-size: 16px; cursor: pointer; }
         .btn-gold { background: var(--gold); color: black; }
         .btn-dark { background: #111; color: white; border: 1px solid #333; }
+        .btn-hint { background: transparent; color: var(--accent); border: 1px dashed var(--accent); font-size: 12px; margin-top: 5px; }
     </style>
 </head>
 <body onload="runIntro()">
 
     <div id="intro-overlay">
-        <div class="intro-text">Synchronizing Language</div>
-        <div id="loader-word" class="word-loader">BOSS</div>
+        <div style="color:var(--gold); letter-spacing:8px;">ELITE SYSTEM</div>
+        <div id="loader-word" style="font-size:40px; font-weight:900; margin-top:20px;">BOSS</div>
         <div class="progress-bar"><div id="p-fill"></div></div>
     </div>
 
     <div id="home-menu">
-        <div style="font-size: 12px; letter-spacing: 4px; color: var(--accent);">ANGOLA ELITE</div>
-        <h1 style="font-size: 45px; margin: 10px 0;">MESTRE <span style="color:var(--gold)">AI</span></h1>
-        
+        <div style="font-size: 12px; color: var(--accent);">ANGOLA ELITE</div>
+        <h1 style="font-size: 40px;">MESTRE <span style="color:var(--gold)">AI</span></h1>
         <div class="boss-card">
-            <div id="mascot-icon" style="font-size: 50px; margin-bottom: 10px;">⚪🦁</div>
-            <div style="font-size: 20px; font-weight: 900;">ALBINO KING STATUS</div>
-            <p id="stats-display" style="font-size: 12px; color: #888; margin-bottom: 25px;">Loading Stats...</p>
-            
+            <div id="mascot-icon" style="font-size: 50px;">⚪🦁</div>
+            <p id="stats-display" style="font-size: 12px; color: #888;">Loading...</p>
             <button class="menu-btn btn-gold" onclick="enterMap()">START MISSION</button>
             <button class="menu-btn btn-dark" onclick="openShop()">THE PALANCA SHOP</button>
         </div>
+    </div>
+
+    <div id="battle-screen">
+        <div id="battle-header" style="color:var(--gold); font-weight:800; letter-spacing:2px;">MISSION 1</div>
+        <div id="health-display" style="font-size:20px; margin:10px 0;">❤️❤️❤️</div>
+        <div class="boss-card">
+            <div style="font-size:12px; color:var(--accent); margin-bottom:10px;">TRANSLATE TO PORTUGUESE</div>
+            <h2 id="question-text" style="font-size:28px; margin:0;">Red</h2>
+            <input type="text" id="answer-input" placeholder="..." autocomplete="off">
+            <button class="menu-btn btn-gold" onclick="checkAnswer()">COMMIT ANSWER</button>
+            <button id="hint-btn" class="menu-btn btn-hint" onclick="getHint()">USE HINT (100 Kz)</button>
+        </div>
+        <button class="menu-btn btn-dark" onclick="exitBattle()" style="margin-top:20px; opacity:0.5;">ABORT</button>
     </div>
 
     <script>
@@ -64,53 +66,90 @@
         let wordIdx = 0;
         let userStats = { level: 1, stars: 0, kwanza: 5400, health: 3 };
 
+        const missions = [
+            { q: "Red", a: "Vermelho" }, { q: "Blue", a: "Azul" }, { q: "Green", a: "Verde" },
+            { q: "BOSS: Yellow", a: "Amarelo" }, // LVL 4
+            { q: "Settings", a: "Definições" }, { q: "Password", a: "Palavra-passe" }, { q: "Privacy", a: "Privacidade" },
+            { q: "BOSS: Security Settings", a: "Definições de segurança" }, // LVL 8
+            { q: "Change Password", a: "Alterar palavra-passe" }, { q: "System Update", a: "Atualização do sistema" },
+            { q: "ULTIMATE BOSS: Albino Lion", a: "Leão Albino" }, // LVL 11
+            { q: "Language", a: "Língua" }, { q: "Success", a: "Sucesso" }
+        ];
+
         function runIntro() {
-            // Word Cycle
-            const interval = setInterval(() => {
+            setInterval(() => {
                 document.getElementById('loader-word').innerText = bossWords[wordIdx];
                 wordIdx = (wordIdx + 1) % bossWords.length;
             }, 800);
-
-            // Fill Bar
-            setTimeout(() => { document.getElementById('p-fill').style.width = "100%"; }, 100);
-
-            // Transition
+            setTimeout(() => document.getElementById('p-fill').style.width = "100%", 100);
             setTimeout(() => {
-                clearInterval(interval);
                 document.getElementById('intro-overlay').style.display = "none";
-                const menu = document.getElementById('home-menu');
-                menu.style.display = "flex";
-                setTimeout(() => { 
-                    menu.style.opacity = "1"; 
-                    updateUI();
-                }, 50);
+                document.getElementById('home-menu').style.display = "flex";
+                updateUI();
             }, 4500);
         }
 
         function updateUI() {
-            const display = document.getElementById('stats-display');
-            let levelType = (userStats.level % 4 === 0) ? "BOSS LEVEL" : "Standard";
-            display.innerHTML = `Level: ${userStats.level}/13 (${levelType})<br>${userStats.kwanza} Kz | ⭐ ${userStats.stars}`;
+            document.getElementById('stats-display').innerHTML = `Level: ${userStats.level}/13 | ${userStats.kwanza} Kz | ⭐ ${userStats.stars}`;
         }
 
         function enterMap() {
-            if(userStats.level >= 13) {
-                alert("Master Status Achieved! Albino Lion Unlocked.");
-                return;
-            }
-            // Logic for the 10 levels + 3 Bosses
-            let isBoss = [4, 8, 11].includes(userStats.level);
-            let msg = isBoss ? "⚠️ BOSS BATTLE STARTING! ⚠️" : "Mission Starting...";
-            alert(msg);
+            if(userStats.level > 13) return alert("All levels complete!");
+            document.getElementById('home-menu').style.display = "none";
+            document.getElementById('battle-screen').style.display = "flex";
             
-            userStats.level++;
-            userStats.stars += 3;
-            userStats.kwanza += 1200;
+            let m = missions[userStats.level-1];
+            document.getElementById('battle-header').innerText = `LEVEL ${userStats.level}`;
+            document.getElementById('question-text').innerText = m.q;
+            document.getElementById('answer-input').value = "";
+            updateHealthUI();
+        }
+
+        function checkAnswer() {
+            let input = document.getElementById('answer-input').value.trim().toLowerCase();
+            let correct = missions[userStats.level-1].a.toLowerCase();
+
+            if(input === correct) {
+                alert("PERFECT! +1200 Kz");
+                userStats.kwanza += 1200;
+                userStats.stars += 3;
+                userStats.level++;
+                exitBattle();
+            } else {
+                userStats.health--;
+                updateHealthUI();
+                if(userStats.health <= 0) {
+                    alert("MISSION FAILED. Try again!");
+                    userStats.health = 3;
+                    exitBattle();
+                } else {
+                    alert("WRONG SPELLING. Watch out!");
+                }
+            }
+        }
+
+        function getHint() {
+            if(userStats.kwanza < 100) return alert("Not enough Kwanza!");
+            userStats.kwanza -= 100;
+            let a = missions[userStats.level-1].a;
+            alert(`HINT: It starts with '${a[0]}' and ends with '${a[a.length-1]}'`);
+            updateUI();
+        }
+
+        function updateHealthUI() {
+            let h = "";
+            for(let i=0; i<userStats.health; i++) h += "❤️";
+            document.getElementById('health-display').innerText = h;
+        }
+
+        function exitBattle() {
+            document.getElementById('battle-screen').style.display = "none";
+            document.getElementById('home-menu').style.display = "flex";
             updateUI();
         }
 
         function openShop() {
-            alert("SHOP PRICES:\nElephant: 2,000 Kz\nAlbino Lion: 250,000 Kz\n\nYour Balance: " + userStats.kwanza + " Kz");
+            alert(`--- SHOP ---\nElephant: 2,000 Kz\nAlbino Lion: 250,000 Kz\n\nBalance: ${userStats.kwanza} Kz`);
         }
     </script>
 </body>
