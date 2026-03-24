@@ -1,96 +1,117 @@
-<script>
-    // --- APP STATE & DATA ---
-    const bossWords = ["POWER", "KNOWLEDGE", "EMPIRE", "FREEDOM"];
-    let wordIdx = 0;
-    
-    // Game Progress Variables
-    let userStats = {
-        level: 1,
-        stars: 0,
-        kwanza: 5400,
-        health: 3,
-        mascotsUnlocked: []
-    };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mestre AI - Cinematic Elite</title>
+    <style>
+        :root { --gold: #ffd700; --dark: #050505; --accent: #00ffcc; }
+        * { box-sizing: border-box; font-family: sans-serif; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; }
 
-    // Prices as requested: Elephant easy, Albino Lion very expensive
-    const shopPrices = {
-        "Elephant": 2000,
-        "Giraffe": 15000,
-        "Palanca": 50000,
-        "Albino Lion": 250000 
-    };
+        /* INTRO OVERLAY */
+        #intro-overlay {
+            position: fixed; inset: 0; z-index: 9999; background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .intro-text { font-size: 14px; letter-spacing: 8px; color: var(--gold); text-transform: uppercase; }
+        .word-loader { font-size: 40px; font-weight: 900; margin-top: 20px; color: white; }
+        .progress-bar { width: 200px; height: 2px; background: #222; margin-top: 40px; position: relative; }
+        #p-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--gold); width: 0%; transition: width 4s linear; }
 
-    // --- CINEMATIC INTRO LOGIC ---
-    function runIntro() {
-        createParticles();
-        const interval = setInterval(() => {
-            document.getElementById('loader-word').innerText = bossWords[wordIdx];
-            wordIdx = (wordIdx + 1) % bossWords.length;
-        }, 800);
+        /* HOME MENU */
+        #home-menu {
+            display: none; height: 100vh; flex-direction: column;
+            background: radial-gradient(circle at top right, #1a1a00, #000);
+            padding: 40px 20px; text-align: center; opacity: 0;
+        }
+        .boss-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 30px; padding: 30px; margin-top: 50px;
+        }
+        .menu-btn {
+            width: 100%; padding: 18px; margin-top: 15px; border-radius: 15px;
+            border: none; font-weight: 900; font-size: 16px; cursor: pointer;
+        }
+        .btn-gold { background: var(--gold); color: black; }
+        .btn-dark { background: #111; color: white; border: 1px solid #333; }
+    </style>
+</head>
+<body onload="runIntro()">
 
-        setTimeout(() => { document.getElementById('p-fill').style.width = "100%"; }, 100);
+    <div id="intro-overlay">
+        <div class="intro-text">Synchronizing Language</div>
+        <div id="loader-word" class="word-loader">BOSS</div>
+        <div class="progress-bar"><div id="p-fill"></div></div>
+    </div>
 
-        setTimeout(() => {
-            clearInterval(interval);
-            const intro = document.getElementById('intro-overlay');
-            intro.style.opacity = "0";
-            intro.style.transform = "scale(1.2)";
+    <div id="home-menu">
+        <div style="font-size: 12px; letter-spacing: 4px; color: var(--accent);">ANGOLA ELITE</div>
+        <h1 style="font-size: 45px; margin: 10px 0;">MESTRE <span style="color:var(--gold)">AI</span></h1>
+        
+        <div class="boss-card">
+            <div id="mascot-icon" style="font-size: 50px; margin-bottom: 10px;">⚪🦁</div>
+            <div style="font-size: 20px; font-weight: 900;">ALBINO KING STATUS</div>
+            <p id="stats-display" style="font-size: 12px; color: #888; margin-bottom: 25px;">Loading Stats...</p>
             
+            <button class="menu-btn btn-gold" onclick="enterMap()">START MISSION</button>
+            <button class="menu-btn btn-dark" onclick="openShop()">THE PALANCA SHOP</button>
+        </div>
+    </div>
+
+    <script>
+        const bossWords = ["POWER", "KNOWLEDGE", "EMPIRE", "FREEDOM"];
+        let wordIdx = 0;
+        let userStats = { level: 1, stars: 0, kwanza: 5400, health: 3 };
+
+        function runIntro() {
+            // Word Cycle
+            const interval = setInterval(() => {
+                document.getElementById('loader-word').innerText = bossWords[wordIdx];
+                wordIdx = (wordIdx + 1) % bossWords.length;
+            }, 800);
+
+            // Fill Bar
+            setTimeout(() => { document.getElementById('p-fill').style.width = "100%"; }, 100);
+
+            // Transition
             setTimeout(() => {
-                intro.style.display = "none";
+                clearInterval(interval);
+                document.getElementById('intro-overlay').style.display = "none";
                 const menu = document.getElementById('home-menu');
                 menu.style.display = "flex";
-                setTimeout(() => {
-                    menu.style.opacity = "1";
-                    menu.style.transform = "translateY(0)";
-                    updateMenuStats();
+                setTimeout(() => { 
+                    menu.style.opacity = "1"; 
+                    updateUI();
                 }, 50);
-            }, 600);
-        }, 4500);
-    }
-
-    function createParticles() {
-        for(let i=0; i<30; i++) {
-            let p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.top = Math.random() * 100 + 'vh';
-            document.getElementById('intro-overlay').appendChild(p);
+            }, 4500);
         }
-    }
 
-    // --- NEW MISSION LOGIC (The 13 Stages) ---
-    function updateMenuStats() {
-        const statsEl = document.querySelector('.boss-card p');
-        statsEl.innerHTML = `Level: ${userStats.level}/13 | ${userStats.kwanza} Kz | ⭐ ${userStats.stars}`;
-    }
+        function updateUI() {
+            const display = document.getElementById('stats-display');
+            let levelType = (userStats.level % 4 === 0) ? "BOSS LEVEL" : "Standard";
+            display.innerHTML = `Level: ${userStats.level}/13 (${levelType})<br>${userStats.kwanza} Kz | ⭐ ${userStats.stars}`;
+        }
 
-    function enterMap() {
-        let type = "Standard Level";
-        if ([4, 8, 11].includes(userStats.level)) type = "⚠️ BOSS LEVEL ⚠️";
-        
-        alert(`MISSION START: Level ${userStats.level}\nType: ${type}\nTarget: Unlock the Albino Lion!`);
-        
-        // Simulating Level Completion
-        if(userStats.level < 13) {
+        function enterMap() {
+            if(userStats.level >= 13) {
+                alert("Master Status Achieved! Albino Lion Unlocked.");
+                return;
+            }
+            // Logic for the 10 levels + 3 Bosses
+            let isBoss = [4, 8, 11].includes(userStats.level);
+            let msg = isBoss ? "⚠️ BOSS BATTLE STARTING! ⚠️" : "Mission Starting...";
+            alert(msg);
+            
             userStats.level++;
             userStats.stars += 3;
-            userStats.kwanza += 500;
-            updateMenuStats();
-        } else {
-            alert("CONGRATULATIONS! You have mastered the Luanda Core.");
+            userStats.kwanza += 1200;
+            updateUI();
         }
-    }
 
-    function openShop() {
-        let message = "--- THE PALANCA SHOP ---\n";
-        for (let m in shopPrices) {
-            message += `${m}: ${shopPrices[m]} Kz\n`;
+        function openShop() {
+            alert("SHOP PRICES:\nElephant: 2,000 Kz\nAlbino Lion: 250,000 Kz\n\nYour Balance: " + userStats.kwanza + " Kz");
         }
-        alert(message + `\nYour Balance: ${userStats.kwanza} Kz`);
-    }
-
-    function openRealEstate() {
-        alert("Properties: T3 Apartment in Kilamba - Secured.");
-    }
-</script>
+    </script>
+</body>
+</html>
