@@ -3,35 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - Open World Luanda</title>
+    <title>Mestre AI - World Conquest</title>
     <style>
-        :root { 
-            --gold: #ffd700; --dark: #050505; --surface: #121212; 
-            --accent: #00ffcc; --legendary: #ff00ff; 
-        }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        :root { --gold: #ffd700; --dark: #050505; --surface: #121212; --accent: #00ffcc; --legendary: #ff00ff; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
         body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* THE FANTASTIC MAP */
-        #map-screen {
-            position: fixed; inset: 0; z-index: 4000;
-            background: radial-gradient(circle at center, #1a1a1a, #000);
-            display: flex; flex-direction: column; padding: 20px; overflow-y: auto;
-        }
-        .map-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .district-card {
-            background: rgba(255,255,255,0.03); border: 1px solid #333;
-            border-radius: 20px; padding: 20px; margin-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; position: relative;
-        }
-        .district-card.locked { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
-        .district-card.active { border-color: var(--gold); background: rgba(255,215,0,0.05); }
-        .stars { color: #444; font-size: 18px; letter-spacing: 3px; }
-        .stars.earned { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+        /* WORLD SELECTOR */
+        #world-map { position: fixed; inset: 0; z-index: 5000; background: #000; display: flex; flex-direction: column; padding: 30px; align-items: center; justify-content: center; }
+        .country-card { width: 100%; max-width: 350px; background: #111; border: 1px solid #333; border-radius: 25px; padding: 25px; margin-bottom: 20px; text-align: center; cursor: pointer; }
+        .country-card.active { border-color: var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+        .country-card.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
 
-        /* ALBINO KING MODE */
-        .albino-gold-ui { background: linear-gradient(135deg, #000 0%, #2c2500 100%) !important; border-color: var(--gold) !important; }
+        /* BOSS CHEST ANIMATION */
+        #chest-zone { margin: 20px 0; padding: 20px; background: rgba(255,215,0,0.1); border-radius: 20px; border: 1px dashed var(--gold); cursor: pointer; }
+        #chest-zone:active { transform: scale(0.95); }
+
+        /* MAP UI */
+        #map-screen { position: fixed; inset: 0; z-index: 4000; background: #000; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .district-card { background: #1a1a1a; border-radius: 20px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+        .stars { color: var(--gold); font-size: 14px; }
 
         /* APP UI */
         #app { display: none; height: 100vh; flex-direction: column; }
@@ -41,158 +32,130 @@
         .bot { background: var(--surface); border: 1px solid #333; align-self: flex-start; }
         .user { background: var(--gold); color: #000; align-self: flex-end; font-weight: 900; }
 
-        /* BUILDER */
         .builder { background: var(--surface); padding: 20px; border-radius: 40px 40px 0 0; border-top: 1px solid #444; }
-        .chip-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .chip { background: #000; padding: 12px 20px; border-radius: 15px; border: 1px solid #333; white-space: nowrap; font-size: 13px; cursor: pointer; color: #ccc; }
-        .chip:active { background: var(--gold); color: black; }
-
         .input-group { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 25px; border: 1px solid #444; }
         input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; }
 
-        @keyframes pop { from { opacity:0; transform: translateY(20px) scale(0.9); } to { opacity:1; transform: translateY(0) scale(1); } }
+        @keyframes pop { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
     </style>
 </head>
-<body id="main-body">
+<body>
+
+    <div id="world-map">
+        <h1 style="color:var(--gold); margin-bottom:5px;">WORLD MISSIONS</h1>
+        <p style="color:#666; margin-bottom:30px;">Select your next territory</p>
+
+        <div class="country-card active" onclick="showLuandaMap()">
+            <div style="font-size:40px;">🇦🇴</div>
+            <h2 style="margin:10px 0 5px;">ANGOLA</h2>
+            <p style="font-size:12px; color:var(--accent);">Current Empire: Luanda Districts</p>
+        </div>
+
+        <div class="country-card locked">
+            <div style="font-size:40px;">🇨🇩</div>
+            <h2 style="margin:10px 0 5px;">CONGO KINSHASA</h2>
+            <p style="font-size:12px; color:#888;">Unlocks at Rank #10</p>
+        </div>
+
+        <div id="chest-zone" onclick="openChest()">
+            <div id="chest-icon" style="font-size:30px;">🎁</div>
+            <div style="font-size:10px; font-weight:bold; color:var(--gold);">DAILY BOSS CHEST</div>
+        </div>
+    </div>
 
     <div id="map-screen">
-        <div class="map-header">
-            <h1 style="color:var(--gold); margin:0;">LUANDA EMPIRE</h1>
-            <div style="font-weight: 900;">💰 <span id="map-coins">5000</span> Kz</div>
-        </div>
-        
+        <header>
+            <button onclick="exitToWorld()" style="background:transparent; border:none; color:white;">⬅ WORLD</button>
+            <div style="font-weight: 900; color: var(--gold);">💰 <span id="map-coins">5000</span> Kz</div>
+        </header>
+        <h2 style="margin:20px 0;">LUANDA DISTRICTS</h2>
         <div id="district-list">
+            <div class="district-card" onclick="startApp('Ilha do Cabo')">
+                <span>1. Ilha do Cabo</span>
+                <span class="stars">★★★</span>
             </div>
-        
-        <button onclick="toggleAlbinoMode()" id="albino-btn" style="margin-top:20px; padding:15px; border-radius:15px; background:var(--legendary); color:white; border:none; font-weight:bold; display:none;">EQUIP ALBINO KING (2X KWANZA)</button>
+            <div class="district-card" onclick="startApp('Ingombota')">
+                <span>2. Ingombota</span>
+                <span class="stars">★★☆</span>
+            </div>
+            <div class="district-card" onclick="startApp('Kilamba')">
+                <span>3. Kilamba City</span>
+                <span class="stars">☆☆☆</span>
+            </div>
+        </div>
     </div>
 
     <div id="app">
-        <header id="app-header">
-            <button onclick="backToMap()" style="background:transparent; border:none; color:white; font-size:20px;">🗺️</button>
+        <header>
+            <button onclick="backToMap()" style="background:transparent; border:none; color:white;">🗺️</button>
             <div style="font-weight: 900; color: var(--gold);">💰 <span id="app-coins">5000</span> Kz</div>
-            <div id="lesson-title" style="color:var(--accent); font-weight:800; font-size:11px;">LESSON</div>
+            <div id="lesson-tag" style="font-size:10px; color:var(--accent);">LUANDA</div>
         </header>
-
-        <div id="chat"></div>
-
+        <div id="chat">
+            <div class="bubble bot"><b>Mestre:</b> 🦌<br>District Loaded. Ready to earn more Kwanza, Boss?</div>
+        </div>
         <div class="builder">
-            <div id="chip-container"></div>
             <div class="input-group">
-                <input type="text" id="words-in" readonly placeholder="Select words...">
-                <button onclick="send()" style="background:var(--gold); border:none; border-radius:50%; width:45px; height:45px; font-weight:bold;">➔</button>
+                <input type="text" id="words-in" placeholder="Select phrases to start...">
+                <button onclick="sendMsg()" style="background:var(--gold); border:none; border-radius:50%; width:45px; height:45px; font-weight:bold;">➔</button>
             </div>
         </div>
     </div>
 
     <script>
         let coins = 5000;
-        let isAlbino = false;
-        let currentDistrict = "";
-        
-        const districts = [
-            { id: "ilha", name: "Ilha do Cabo", stars: 3, status: "unlocked", lesson: "Beach & Dining" },
-            { id: "ingombota", name: "Ingombota", stars: 2, status: "unlocked", lesson: "Grocery & Shopping" },
-            { id: "kilamba", name: "Kilamba City", stars: 0, status: "unlocked", lesson: "Real Estate" },
-            { id: "bai", name: "BAI Towers", stars: 0, status: "locked", lesson: "Business & Banking" }
-        ];
 
-        const vocab = {
-            bai: {
-                "Biz": ["I have a meeting", "I need a bank account", "Where is the manager?", "What is the interest rate?"],
-                "Terms": ["investment", "savings", "contract", "salary", "profit", "transfer"],
-                "Logic": { "meeting": "reunião", "bank": "banco", "manager": "gerente", "salary": "salário" }
-            }
-        };
-
-        function renderMap() {
-            const list = document.getElementById('district-list');
-            list.innerHTML = "";
-            districts.forEach(d => {
-                let starHtml = "";
-                for(let i=1; i<=3; i++) starHtml += `<span class="stars ${i <= d.stars ? 'earned' : ''}">★</span>`;
-                
-                list.innerHTML += `
-                    <div class="district-card ${d.status} ${currentDistrict === d.id ? 'active' : ''}" onclick="startDistrict('${d.id}')">
-                        <div>
-                            <div style="font-weight:900; font-size:18px;">${d.name}</div>
-                            <div style="font-size:10px; color:#888;">${d.lesson}</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div class="stars-row">${starHtml}</div>
-                            ${d.status === 'locked' ? '🔒' : '➔'}
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('map-coins').innerText = coins;
+        function openChest() {
+            const reward = Math.floor(Math.random() * 1000) + 500;
+            coins += reward;
+            document.getElementById('chest-icon').innerText = "💰";
+            document.getElementById('chest-zone').onclick = null;
+            document.getElementById('chest-zone').style.opacity = "0.5";
+            alert(`BOSS REWARD! You found ${reward} Kz in the chest!`);
+            updateUI();
         }
 
-        function startDistrict(id) {
-            const d = districts.find(x => x.id === id);
-            if(d.status === 'locked') return alert("Complete previous districts first!");
-            
-            currentDistrict = id;
+        function showLuandaMap() {
+            document.getElementById('world-map').style.display = 'none';
+            document.getElementById('map-screen').style.display = 'flex';
+        }
+
+        function exitToWorld() {
+            document.getElementById('map-screen').style.display = 'none';
+            document.getElementById('world-map').style.display = 'flex';
+        }
+
+        function startApp(district) {
             document.getElementById('map-screen').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            document.getElementById('lesson-title').innerText = d.name.toUpperCase();
-            document.getElementById('app-coins').innerText = coins;
-            
-            loadLesson(id);
-        }
-
-        function loadLesson(id) {
-            const container = document.getElementById('chip-container');
-            container.innerHTML = "";
-            const data = vocab.bai; // Using BAI as example
-            for(let cat in data) {
-                if(cat === "Logic") continue;
-                container.innerHTML += `<div class="chip-scroll">` + data[cat].map(w => `<div class="chip" onclick="add('${w}')">${w}</div>`).join('') + `</div>`;
-            }
-        }
-
-        function add(w) { document.getElementById('words-in').value += (document.getElementById('words-in').value ? " " : "") + w; }
-
-        function send() {
-            const val = document.getElementById('words-in').value;
-            if(!val) return;
-            const chat = document.getElementById('chat');
-            chat.innerHTML += `<div class="bubble user">${val}</div>`;
-            
-            let reward = isAlbino ? 400 : 200;
-            coins += reward;
-            document.getElementById('app-coins').innerText = coins;
-
-            setTimeout(() => {
-                chat.innerHTML += `<div class="bubble bot"><b>Mestre:</b><br>Transaction Complete.<br><small style="color:var(--gold)">+${reward} Kz Earned!</small></div>`;
-                chat.scrollTop = chat.scrollHeight;
-                speak(val);
-            }, 600);
-            document.getElementById('words-in').value = "";
-        }
-
-        function toggleAlbinoMode() {
-            isAlbino = !isAlbino;
-            const body = document.getElementById('main-body');
-            const header = document.getElementById('app-header');
-            if(isAlbino) {
-                body.classList.add('albino-gold-ui');
-                header.style.background = "linear-gradient(to right, #000, #4e4200)";
-            } else {
-                body.classList.remove('albino-gold-ui');
-            }
+            document.getElementById('lesson-tag').innerText = district.toUpperCase();
         }
 
         function backToMap() {
             document.getElementById('app').style.display = 'none';
             document.getElementById('map-screen').style.display = 'flex';
-            renderMap();
         }
 
-        function speak(t) { window.speechSynthesis.cancel(); let m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; window.speechSynthesis.speak(m); }
+        function sendMsg() {
+            const val = document.getElementById('words-in').value;
+            if(!val) return;
+            const chat = document.getElementById('chat');
+            chat.innerHTML += `<div class="bubble user">${val}</div>`;
+            coins += 200;
+            updateUI();
+            setTimeout(() => {
+                chat.innerHTML += `<div class="bubble bot"><b>Mestre:</b><br>Sentence processed. Keep going!</div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 600);
+            document.getElementById('words-in').value = "";
+        }
 
-        renderMap();
-        // Secret unlock: If you have > 100k coins, show Albino button
-        if(coins >= 5000) document.getElementById('albino-btn').style.display = 'block';
+        function updateUI() {
+            document.getElementById('map-coins').innerText = coins;
+            document.getElementById('app-coins').innerText = coins;
+        }
+
+        updateUI();
     </script>
 </body>
 </html>
