@@ -3,78 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI Elite</title>
+    <title>Mestre AI Uber</title>
     <style>
-        body { background: #0a0a0a; color: #eee; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
-        #chat { flex-grow: 1; border: 1px solid #333; border-radius: 15px; padding: 15px; overflow-y: auto; background: #111; margin-bottom: 10px; }
-        .bot { color: #00ffcc; margin-bottom: 15px; border-left: 4px solid #ffd700; padding-left: 10px; }
+        body { background: #050505; color: #eee; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        #chat { flex-grow: 1; border: 1px solid #444; border-radius: 15px; padding: 15px; overflow-y: auto; background: #0f0f0f; margin-bottom: 10px; box-shadow: inset 0 0 20px #000; }
+        .bot { color: #00ffcc; margin-bottom: 15px; border-left: 4px solid #ffd700; padding-left: 10px; animation: slideIn 0.3s; }
         .user { color: #ffd700; margin-bottom: 15px; text-align: right; font-weight: bold; }
-        .menu { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .m-btn { background: #333; color: #ffd700; border: 1px solid #ffd700; padding: 8px 15px; border-radius: 20px; font-size: 12px; white-space: nowrap; }
+        
+        /* UBER BUILDER BOX */
+        .builder { background: #1a1a1a; padding: 10px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #ffd700; }
+        .row { display: flex; gap: 5px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
+        .row::-webkit-scrollbar { display: none; }
+        .chip { background: #333; color: white; padding: 8px 15px; border-radius: 8px; font-size: 13px; white-space: nowrap; border: 1px solid #555; }
+        .chip:active { background: #ffd700; color: black; }
+        
         .controls { display: flex; gap: 5px; padding-bottom: 10px; }
         input { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: white; -webkit-appearance: none; }
         button#send { padding: 15px 20px; background: #ffd700; border: none; border-radius: 12px; font-weight: bold; color: black; }
+        @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
-    <h3 style="text-align:center; color:#ffd700; margin: 5px;">MESTRE AI ELITE 🇦🇴🇺🇸</h3>
+    <h3 style="text-align:center; color:#ffd700; margin: 5px; letter-spacing: 2px;">UBER MESTRE AI 🇦🇴</h3>
     
     <div id="chat">
-        <div class="bot"><b>Mestre:</b> Dictionary Beefed Up! 🥩 I now know Questions, Weather, and Adjectives.</div>
+        <div class="bot"><b>Mestre:</b> Uber System Engaged. Tap the blocks to build a sentence! / Toca nos blocos para formar uma frase!</div>
     </div>
 
-    <div class="menu">
-        <div class="m-btn" onclick="sendL('Questions')">❓ PERGUNTAS</div>
-        <div class="m-btn" onclick="sendL('Weather')">☁️ TEMPO</div>
-        <div class="m-btn" onclick="sendL('Adjectives')">✨ DESCREVER</div>
+    <div class="builder">
+        <div class="row" id="who">
+            <div class="chip" onclick="add('I ')">I (Eu)</div>
+            <div class="chip" onclick="add('You ')">You (Tu)</div>
+            <div class="chip" onclick="add('He ')">He (Ele)</div>
+            <div class="chip" onclick="add('She ')">She (Ela)</div>
+            <div class="chip" onclick="add('We ')">We (Nós)</div>
+        </div>
+        <div class="row" id="action">
+            <div class="chip" onclick="add('am ')">am/are/is (sou/estou)</div>
+            <div class="chip" onclick="add('want ')">want (quero)</div>
+            <div class="chip" onclick="add('have ')">have (tenho)</div>
+            <div class="chip" onclick="add('need ')">need (preciso)</div>
+            <div class="chip" onclick="add('go to ')">go to (vou para)</div>
+        </div>
+        <div class="row" id="desc">
+            <div class="chip" onclick="add('happy')">happy (feliz)</div>
+            <div class="chip" onclick="add('hungry')">hungry (fome)</div>
+            <div class="chip" onclick="add('water')">water (água)</div>
+            <div class="chip" onclick="add('work')">work (trabalho)</div>
+            <div class="chip" onclick="add('school')">school (escola)</div>
+            <div class="chip" onclick="add('now')">now (agora)</div>
+        </div>
     </div>
 
     <div class="controls">
-        <input type="text" id="words" placeholder="Escreva..." autocomplete="off">
+        <input type="text" id="words" placeholder="Sentence builds here..." autocomplete="off">
         <button id="send" onclick="p()">SEND</button>
     </div>
 
     <script>
         var lib = {
-            // QUESTIONS (As "5 Ws")
-            "who": "Quem", "what": "O que", "where": "Onde", "when": "Quando", "why": "Porque", "how": "Como", "because": "Porque (resposta)",
-            // WEATHER (Tempo)
-            "sun": "Sol", "rain": "Chuva", "wind": "Vento", "cloud": "Nuvem", "hot": "Quente", "cold": "Frio", "storm": "Tempestade", "weather": "Tempo",
-            // QUANTITATIVE (Quantitativos)
-            "many": "Muitos", "much": "Muito", "few": "Poucos", "some": "Alguns", "all": "Tudo", "half": "Metade", "empty": "Vazio", "full": "Cheio",
-            // ADJECTIVES (Descritivos)
-            "big": "Grande", "small": "Pequeno", "fast": "Rápido", "slow": "Lento", "good": "Bom", "bad": "Mau", "happy": "Feliz", "sad": "Triste", "strong": "Forte", "weak": "Fraco", "easy": "Fácil", "hard": "Difícil", "beautiful": "Bonito", "ugly": "Feio", "new": "Novo", "old": "Velho", "rich": "Rico", "poor": "Pobre",
-            // BASICS
-            "hello": "Ola", "ok": "Esta bem", "yes": "Sim", "no": "Nao", "work": "Trabalhar", "speak": "Falar"
+            "i am happy": "Eu estou feliz",
+            "i want water": "Eu quero água",
+            "you are happy": "Tu estás feliz",
+            "i go to school": "Eu vou para a escola",
+            "i need work": "Eu preciso de trabalho",
+            "he is hungry": "Ele tem fome"
         };
 
-        function f(t){window.speechSynthesis.cancel();var m=new SpeechSynthesisUtterance(t);m.lang='en-US';m.rate=0.8;window.speechSynthesis.speak(m);}
+        function f(t){window.speechSynthesis.cancel(); var m=new SpeechSynthesisUtterance(t); m.lang='en-US'; m.rate=0.8; window.speechSynthesis.speak(m);}
         
-        function sendL(tipo) {
-            document.getElementById("words").value = tipo;
-            p();
+        function add(word) {
+            document.getElementById("words").value += word;
         }
 
         function p(){
             var c=document.getElementById("words"), t=document.getElementById("chat"), i=c.value.trim().toLowerCase();
-            if(!i)return; t.innerHTML+="<div class='user'>"+i+"</div>";
-            var en="I heard "+i; var pt="Ouvi "+i;
+            if(!i)return; 
+            t.innerHTML+="<div class='user'>"+i+"</div>";
             
-            // SPECIAL CATEGORY RESPONSES
-            if(i === "questions"){ en="Question Words: Who, What, Where, When, Why, How."; pt="Palavras de Pergunta: Quem, O que, Onde, Quando, Porque, Como."; }
-            else if(i === "weather"){ en="Weather: Sun, Rain, Wind, Hot, Cold."; pt="Tempo: Sol, Chuva, Vento, Quente, Frio."; }
-            else if(i === "adjectives"){ en="Adjectives: Big, Small, Fast, Slow, Strong, Weak."; pt="Adjetivos: Grande, Pequeno, Rápido, Lento, Forte, Fraco."; }
-            
-            // DICTIONARY SEARCH
-            else if(lib[i]){ en="Translation: "+lib[i]; pt=i.toUpperCase()+" é "+lib[i]; }
-            else {
-                var achou = false;
-                for(var k in lib){ if(lib[k].toLowerCase()===i){ en="In English: "+k.toUpperCase(); pt="Em Inglês: "+k.toUpperCase(); achou=true; break; } }
-                if(!achou) { en="I am learning "+i; pt="Estou a aprender "+i; }
+            var resPT = "Frase construída!";
+            var found = false;
+
+            // Simple Logic for the Builder
+            for(var key in lib){
+                if(i.includes(key)){
+                    resPT = lib[key];
+                    found = true;
+                    break;
+                }
             }
 
-            t.innerHTML+="<div class='bot'><b>Mestre:</b> "+en+"<br><small>"+pt+"</small></div>";
-            f(en); c.value=""; t.scrollTop=t.scrollHeight;
+            if(!found) resPT = "Analyzing sentence...";
+
+            t.innerHTML+="<div class='bot'><b>Mestre:</b> " + i.toUpperCase() + "<br><small>" + resPT + "</small></div>";
+            f(i);
+            c.value="";
+            t.scrollTop=t.scrollHeight;
         }
     </script>
 </body>
