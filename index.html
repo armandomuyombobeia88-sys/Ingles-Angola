@@ -102,3 +102,29 @@
 
 </body>
 </html>
+{
+  "beginner_core_50": [
+    "the", "be", "to", "of", "and", "a", "in", "that", "have", "i",
+    "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
+    "this", "but", "his", "by", "from", "they", "we", "say", "her", "she",
+    "or", "an", "will", "my", "one", "all", "would", "there", "their", "what",
+    "so", "up", "out", "if", "about", "who", "get", "which", "go", "me"
+  ]import json
+
+# This opens the file you just made
+with open('vocabulary.json') as f:
+    data = json.load(f)
+    word_list = data['beginner_core_50']
+
+def teacher_bot(student_input):
+    # Check if the student used any of the 50 words
+    found = [word for word in word_list if word in student_input.lower().split()]
+    
+    if len(found) > 0:
+        return f"Great job! You used these core words: {', '.join(found)}"
+    else:
+        return "Try using more common words to build your foundation!"
+
+# Test it
+print(teacher_bot("I have a book"))
+}
