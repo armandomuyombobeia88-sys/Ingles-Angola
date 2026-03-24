@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - Super-Brain Edition</title>
+    <title>Mestre AI - Luxury Empire</title>
     <style>
         :root { 
             --gold: #ffd700; --dark: #050505; --surface: #121212; 
@@ -12,25 +12,29 @@
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s; }
         body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* SHOP & UI */
         header { padding: 15px 20px; background: #000; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* THE LEADERBOARD */
+        #leaderboard { background: #111; padding: 10px 20px; font-size: 11px; display: flex; gap: 20px; overflow-x: auto; border-bottom: 1px solid #333; color: #888; }
+        .top-user { white-space: nowrap; font-weight: bold; }
+        .top-user.me { color: var(--gold); }
+
+        /* SHOP & UI */
         #shop-overlay { position: fixed; inset: 0; z-index: 2000; background: #000; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
         .mascot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .card { background: #1a1a1a; padding: 15px; border-radius: 20px; border: 1px solid #333; text-align: center; }
         .card.active { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
 
-        /* CHAT */
-        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: radial-gradient(circle at top, #111, #000); }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
         .bubble { max-width: 85%; padding: 15px; border-radius: 20px; line-height: 1.4; animation: pop 0.4s ease; }
         .bot { background: var(--surface); border: 1px solid #222; align-self: flex-start; border-bottom-left-radius: 2px; }
         .user { background: var(--gold); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 800; }
 
-        /* THE BRAIN INTERFACE */
-        .builder { background: var(--surface); padding: 15px; border-radius: 30px 30px 0 0; border-top: 1px solid #333; max-height: 55vh; overflow-y: auto; }
+        .builder { background: var(--surface); padding: 15px; border-radius: 30px 30px 0; border-top: 1px solid #333; max-height: 55vh; overflow-y: auto; }
         .cat-label { font-size: 10px; color: #666; text-transform: uppercase; margin: 12px 0 5px; font-weight: 900; letter-spacing: 1px; }
         .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .chip { background: #111; padding: 10px 16px; border-radius: 12px; border: 1px solid #333; white-space: nowrap; cursor: pointer; font-size: 13px; color: #bbb; }
-        .chip:active { background: var(--gold); color: #000; transform: scale(0.9); }
+        .chip:active { background: var(--gold); color: #000; }
 
         .input-group { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 20px; border: 1px solid #333; margin-top: 10px; }
         input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; }
@@ -42,36 +46,41 @@
 <body>
 
     <div id="shop-overlay">
-        <h1 style="color:var(--gold)">MASCÔTE SHOP</h1>
+        <h1 style="color:var(--gold)">MASCOT EMPIRE SHOP</h1>
         <div class="mascot-grid" id="shop-list"></div>
-        <button onclick="toggleShop()" style="margin-top:20px; padding:15px; background:white; border:none; border-radius:15px; font-weight:bold;">BACK TO MISSION</button>
+        <button onclick="toggleShop()" style="margin-top:20px; padding:15px; background:white; border:none; border-radius:15px; font-weight:bold; width:100%;">BACK TO STREETS</button>
+    </div>
+
+    <div id="leaderboard">
+        <span class="top-user">1. Rei de Luanda (550k)</span>
+        <span class="top-user">2. Rainha Fuba (410k)</span>
+        <span class="top-user me">15. BOSS (YOU) - <span id="board-coins">3000</span></span>
+        <span class="top-user">16. Candongueiro Pro (2800)</span>
     </div>
 
     <header>
-        <button onclick="toggleShop()" style="background:transparent; border:none; color:white; font-size:20px;">🎒</button>
-        <div style="font-weight: 900; color: var(--gold);">💰 <span id="coins">3000</span> Kz</div>
-        <div style="color:var(--accent); font-weight:800; font-size:12px;">🏆 ROQUE SANTEIRO</div>
+        <button onclick="toggleShop()" style="background:transparent; border:none; color:white; font-size:22px;">🛍️</button>
+        <div style="font-weight: 900; color: var(--gold); font-size: 18px;">💰 <span id="coins">3000</span> Kz</div>
+        <div style="color:var(--accent); font-weight:800; font-size:11px;">📍 CANDONGUEIRO STOP</div>
     </header>
 
     <div id="chat">
         <div class="bubble bot">
             <div id="mestre-icon" style="font-size:40px;">🦌</div>
-            <div><b>Mestre:</b><br>Welcome to <b>Roque Santeiro (Lesson 5)</b>! Time to haggle. The "Super-Brain" is active. It will catch <i>everything</i> you say.</div>
+            <div><b>Mestre:</b><br>Lesson 6: <b>The Candongueiro!</b> You're in a taxi. How do you tell the driver where to go?</div>
         </div>
     </div>
 
     <div class="builder">
-        <div class="cat-label">Haggling Phrases</div>
-        <div class="chip-scroll" id="row-haggle"></div>
-        <div class="cat-label">Numbers & Prices</div>
-        <div class="chip-scroll" id="row-nums"></div>
-        <div class="cat-label">Clothing & Goods</div>
-        <div class="chip-scroll" id="row-goods"></div>
-        <div class="cat-label">Quality Adjectives</div>
-        <div class="chip-scroll" id="row-adj"></div>
+        <div class="cat-label">Taxi Directions</div>
+        <div class="chip-scroll" id="row-dir"></div>
+        <div class="cat-label">The Fare (O Troco)</div>
+        <div class="chip-scroll" id="row-pay"></div>
+        <div class="cat-label">Destinations</div>
+        <div class="chip-scroll" id="row-dest"></div>
 
         <div class="input-group">
-            <input type="text" id="main-input" placeholder="Negotiate with the seller..." readonly>
+            <input type="text" id="main-input" placeholder="Tell the driver..." readonly>
             <button class="send-btn" onclick="process()">➔</button>
         </div>
     </div>
@@ -82,24 +91,22 @@
         
         const mascots = {
             palanca: { icon: '🦌', name: 'Palanca', price: 0, rarity: 'BASIC' },
-            elephant: { icon: '🐘', name: 'Heavy Elephant', price: 4000, rarity: 'RARE' },
-            giraffe: { icon: '🦒', name: 'Tall Giraffe', price: 6000, rarity: 'ELITE' },
-            albino_lion: { icon: '⚪🦁', name: 'Albino Muscle Lion', price: 20000, rarity: 'LEGENDARY' }
+            elephant: { icon: '🐘', name: 'Tank Elephant', price: 1500, rarity: 'EASY' },
+            giraffe: { icon: '🦒', name: 'Scout Giraffe', price: 15000, rarity: 'ELITE' },
+            lion: { icon: '🦁', name: 'Muscle Lion', price: 50000, rarity: 'ROYAL' },
+            albino_lion: { icon: '⚪🦁', name: 'Albino King', price: 150000, rarity: 'LEGENDARY' }
         };
 
-        const superBrain = {
-            "too expensive": "muito caro", "discount": "desconto", "give me": "dá-me", 
-            "lower the price": "baixa o preço", "best price": "melhor preço",
-            "shoes": "sapatos", "shirt": "camisa", "pants": "calças", "quality": "qualidade",
-            "cheap": "barato", "fake": "falso", "real": "verdadeiro",
-            "1000": "mil", "5000": "cinco mil", "kwanza": "kz"
+        const taxiBrain = {
+            "stop here": "pára aqui", "next stop": "próxima paragem", "keep the change": "fica com o troco",
+            "how much": "quanto é", "straight": "frente", "left": "esquerda", "right": "direita",
+            "gas station": "bomba", "market": "mercado", "airport": "aeroporto"
         };
 
         const vocab = {
-            haggle: ["That is too expensive", "Give me a discount", "Lower the price", "I only have", "What is the best price?"],
-            nums: ["1000 Kwanza", "2000 Kwanza", "5000 Kwanza", "last price"],
-            goods: ["these shoes", "this shirt", "this watch", "a new phone", "some clothes"],
-            adj: ["it is fake", "high quality", "very cheap", "too old", "beautiful"]
+            dir: ["Stop here", "Next stop", "Go straight", "Turn left", "Turn right", "Pé no chão!"],
+            pay: ["How much is the trip?", "Here is the money", "Keep the change", "Do you have change?"],
+            dest: ["to the Airport", "to the Market", "to Mutamba", "to Talatona", "to the Hospital"]
         };
 
         function renderShop() {
@@ -112,7 +119,7 @@
                     <div class="card ${inventory.active === id ? 'active' : ''}">
                         <div style="font-size:40px;">${m.icon}</div>
                         <b>${m.name}</b><br>
-                        <small>${m.rarity}</small><br><br>
+                        <small style="color:${m.price > 10000 ? 'var(--legendary)' : '#888'}">${m.rarity}</small><br><br>
                         ${owned ? `<button onclick="equip('${id}')">EQUIP</button>` : `<button onclick="buy('${id}')">BUY ${m.price} Kz</button>`}
                     </div>`;
             }
@@ -124,51 +131,38 @@
                 inventory.owned.push(id);
                 renderShop();
                 updateUI();
-            } else { alert("Go earn more Kwanza at the market!"); }
+            } else { alert("Not enough Kwanza! Keep studying to earn more."); }
         }
 
         function equip(id) { inventory.active = id; document.getElementById('mestre-icon').innerText = mascots[id].icon; toggleShop(); }
         function toggleShop() { const s = document.getElementById('shop-overlay'); s.style.display = s.style.display === 'flex' ? 'none' : 'flex'; renderShop(); }
-
-        function renderChips() {
-            for(let cat in vocab) {
-                document.getElementById('row-' + cat).innerHTML = vocab[cat].map(w => `<div class="chip" onclick="add('${w}')">${w}</div>`).join('');
-            }
-        }
-
+        function renderChips() { for(let cat in vocab) { document.getElementById('row-' + cat).innerHTML = vocab[cat].map(w => `<div class="chip" onclick="add('${w}')">${w}</div>`).join(''); } }
         function add(w) { let i = document.getElementById('main-input'); i.value += (i.value ? " " : "") + w; }
 
         function process() {
             let val = document.getElementById('main-input').value.trim();
             if(!val) return;
             
-            // SUPER BRAIN LOGIC: Multi-pattern replacement
             let translation = val.toLowerCase();
-            for(let eng in superBrain) {
-                if(translation.includes(eng)) {
-                    translation = translation.replace(new RegExp(eng, 'g'), `<b>${superBrain[eng]}</b>`);
-                }
-            }
+            for(let eng in taxiBrain) { if(translation.includes(eng)) { translation = translation.replace(new RegExp(eng, 'g'), `<b>${taxiBrain[eng]}</b>`); } }
 
             let chat = document.getElementById('chat');
             chat.innerHTML += `<div class="user msg">${val}</div>`;
-            coins += 100;
+            coins += 150;
             updateUI();
 
             setTimeout(() => {
-                chat.innerHTML += `
-                    <div class="bot bubble">
-                        <small style="color:var(--accent)">ROQUE SANTEIRO BRAIN:</small><br>
-                        ${translation}<br>
-                        <div style="color:var(--gold); font-size:10px; margin-top:5px;">+100 Kz EARNED!</div>
-                    </div>`;
+                chat.innerHTML += `<div class="bot bubble"><b>Mestre Candongueiro:</b><br>${translation}<br><div style="color:var(--gold); font-size:10px; margin-top:5px;">+150 Kz EARNED!</div></div>`;
                 chat.scrollTop = chat.scrollHeight;
                 speak(val);
             }, 600);
             document.getElementById('main-input').value = "";
         }
 
-        function updateUI() { document.getElementById('coins').innerText = coins; }
+        function updateUI() { 
+            document.getElementById('coins').innerText = coins; 
+            document.getElementById('board-coins').innerText = coins;
+        }
         function speak(t) { window.speechSynthesis.cancel(); let m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; window.speechSynthesis.speak(m); }
 
         renderChips();
