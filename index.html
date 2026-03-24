@@ -1,79 +1,61 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angola English Teacher</title>
-    <style>
-        body { background-color: #1a1a1a; color: white; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; padding: 10px; box-sizing: border-box; }
-        #chat-container { flex-grow: 1; border: 2px solid #ffd700; border-radius: 15px; padding: 15px; overflow-y: auto; margin-bottom: 10px; background: #252525; }
-        .bot-msg { color: #00ffcc; margin-bottom: 10px; line-height: 1.4; }
-        .user-msg { color: #ffffff; font-weight: bold; margin-bottom: 10px; text-align: right; }
-        .input-area { display: flex; gap: 10px; padding-bottom: 10px; }
-        input { flex-grow: 1; padding: 15px; border-radius: 10px; border: none; font-size: 16px; }
-        button { padding: 15px 25px; background: #ffd700; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    </style>
-</head>
-<body>
+<script>
+    // The "Ponte" Dictionary: English to Portuguese
+    const dictionary = {
+        // High Frequency Core Words
+        "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
+        "a": "um/uma", "in": "em", "that": "que", "have": "ter", "i": "eu",
+        "it": "isto", "for": "por", "not": "não", "on": "sobre/em", "with": "com",
+        "he": "ele", "as": "como", "you": "você/tu", "do": "fazer", "at": "em/no",
+        "this": "este/esta", "but": "mas", "his": "dele", "by": "por", "from": "de/desde",
+        "they": "eles/elas", "we": "nós", "say": "dizer", "her": "dela", "she": "ela",
+        "or": "ou", "an": "um/uma", "will": "será (futuro)", "my": "meu/minha", "one": "um",
+        "all": "tudo/todos", "would": "seria", "there": "lá/ali", "their": "deles", "what": "o que"
+    };
 
-    <h2 style="text-align: center; color: #ffd700;">American Teacher 🇺🇸</h2>
-    
-    <div id="chat-container">
-        <div class="bot-msg">Teacher: Hello! I am your American teacher. Escreve algo em Inglês para começarmos!</div>
-    </div>
+    // American Voice Logic
+    function speak(text) {
+        window.speechSynthesis.cancel(); 
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.8; 
+        window.speechSynthesis.speak(msg);
+    }
 
-    <div class="input-area">
-        <input type="text" id="userInput" placeholder="Type here...">
-        <button onclick="sendMessage()">SEND</button>
-    </div>
+    function sendMessage() {
+        const input = document.getElementById("userInput");
+        const container = document.getElementById("chat-container");
+        const text = input.value.trim();
 
-    <script>
-        const dictionary = {
-            "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
-            "a": "um/uma", "in": "em", "that": "que", "have": "ter", "i": "eu",
-            "it": "isto", "for": "por", "not": "não", "on": "sobre", "with": "com"
-        };
+        if (text === "") return;
 
-        function speak(text) {
-            window.speechSynthesis.cancel(); // Stop any current speaking
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'en-US';
-            msg.rate = 0.8; // Slow for learners
-            window.speechSynthesis.speak(msg);
+        // User Message
+        container.innerHTML += `<div class="user-msg">Tu: ${text}</div>`;
+
+        // Logic: Translation & Encouragement
+        let words = text.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"").split(/\s+/);
+        let found = [];
+        
+        words.forEach(w => {
+            if(dictionary[w]) {
+                found.push(`${w.toUpperCase()} (${dictionary[w]})`);
+            }
+        });
+
+        let responseText = "";
+        if (found.length > 0) {
+            responseText = "Very good! You used: " + found.join(", ") + ". Keep practicing!";
+        } else {
+            responseText = "I understood. Try to use words like 'I', 'have', or 'we'. For example: 'I have a book'.";
         }
 
-        function sendMessage() {
-            const input = document.getElementById("userInput");
-            const container = document.getElementById("chat-container");
-            const text = input.value.trim();
+        // Display Bot Response
+        container.innerHTML += `<div class="bot-msg">Teacher: ${responseText}</div>`;
+        
+        // Speak the English response
+        speak(responseText);
 
-            if (text === "") return;
-
-            // User side
-            container.innerHTML += `<div class="user-msg">${text}</div>`;
-
-            // Logic side
-            let words = text.toLowerCase().split(/\s+/);
-            let found = [];
-            
-            words.forEach(w => {
-                if(dictionary[w]) found.push(`${w} (${dictionary[w]})`);
-            });
-
-            let response = found.length > 0 
-                ? "Excellent! You used: " + found.join(", ")
-                : "Good job! Try to use 'I', 'have' or 'with'.";
-
-            // Bot side
-            container.innerHTML += `<div class="bot-msg">Teacher: ${response}</div>`;
-            
-            // Speak
-            speak(response);
-
-            // Cleanup
-            input.value = "";
-            container.scrollTop = container.scrollHeight;
-        }
-    </script>
-</body>
-</html>
+        // UI cleanup
+        input.value = "";
+        container.scrollTop = container.scrollHeight;
+    }
+</script>
