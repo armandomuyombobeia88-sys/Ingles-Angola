@@ -3,94 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Teacher AI</title>
+    <title>Angola Teacher AI</title>
     <style>
         body { background: #121212; color: white; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
-        #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; }
-        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; border-left: 3px solid #ffd700; padding-left: 10px; }
+        #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; box-shadow: inset 0 0 10px #000; }
+        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; border-left: 3px solid #ffd700; padding-left: 10px; animation: fadeIn 0.5s; }
         .user { color: #ffffff; margin-bottom: 15px; text-align: right; font-weight: bold; }
         .controls { display: flex; gap: 5px; padding-bottom: 10px; }
-        input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; }
-        button { padding: 15px; border: none; border-radius: 8px; font-weight: bold; }
-        #sendBtn { background: #ffd700; color: black; }
-        #micBtn { background: #ff4444; color: white; width: 60px; }
+        input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; outline: none; }
+        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; min-width: 70px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Mestre de Voz 🇦🇴🇺🇸</h3>
+    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Mestre AI 🇦🇴🇬🇧</h3>
     
     <div id="chat">
-        <div class="bot">Teacher: Tap 🎤 to speak or type below!</div>
+        <div class="bot"><b>Teacher:</b> Hello! I am your American teacher. How are you? <br><small>(Olá! Eu sou o seu professor Americano. Como está?)</small></div>
     </div>
 
     <div class="controls">
-        <input type="text" id="words" placeholder="Escreva ou fale...">
-        <button id="micBtn" onclick="comecarOuvir()">🎤</button>
-        <button id="sendBtn" onclick="processar()">SEND</button>
+        <input type="text" id="words" placeholder="Escreva aqui...">
+        <button onclick="processar()">SEND</button>
     </div>
 
     <script>
-        var dicionario = {
-            "the": "o", "be": "ser", "to": "para", "of": "de", "and": "e",
-            "have": "ter", "i": "eu", "you": "voce", "work": "trabalhar", "speak": "falar"
-        };
-
-        // 1. VOZ (THE MOUTH)
-        function falar(txt, lang) {
+        function falar(txt) {
             window.speechSynthesis.cancel();
             var msg = new SpeechSynthesisUtterance(txt);
-            msg.lang = lang;
-            msg.rate = 0.8;
+            msg.lang = 'en-US'; msg.rate = 0.8;
             window.speechSynthesis.speak(msg);
         }
 
-        // 2. OUVIDO (THE EARS)
-        var recognition;
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-US'; // Escuta Inglês
-            
-            recognition.onresult = function(event) {
-                var resultado = event.results[0][0].transcript;
-                document.getElementById("words").value = resultado;
-                document.getElementById("micBtn").style.background = "#ff4444";
-                processar(); // Faz a tradução automática
-            };
-        }
-
-        function comecarOuvir() {
-            if (recognition) {
-                window.speechSynthesis.cancel(); // Silencia o bot para ele poder ouvir
-                recognition.start();
-                document.getElementById("micBtn").style.background = "#00ff00";
-            } else {
-                alert("O seu iPhone não suporta voz neste navegador.");
-            }
-        }
-
-        // 3. LOGICA
         function processar() {
             var campo = document.getElementById("words");
             var tela = document.getElementById("chat");
-            var input = campo.value.trim().toLowerCase();
+            var inputRaw = campo.value.trim();
+            // This line cleans the text (no dots, no caps) so the AI understands better
+            var input = inputRaw.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+
             if (input === "") return;
 
-            tela.innerHTML += "<div class='user'>Tu: " + input + "</div>";
-            
-            var resEN = "I heard " + input;
-            var resPT = "Eu ouvi " + input;
+            tela.innerHTML += "<div class='user'>" + inputRaw + "</div>";
 
-            if (dicionario[input]) {
-                resEN = "The translation is " + dicionario[input];
-                resPT = "A tradução de " + input + " é " + dicionario[input];
+            var resEN = ""; 
+            var resPT = "";
+
+            // --- THE AI LESSON BRAIN ---
+            
+            // 1. GREETINGS
+            if (input.includes("hello") || input.includes("hi") || input.includes("ola")) {
+                resEN = "Hello! I am happy to see you. Are you ready for Lesson 1?";
+                resPT = "Olá! Estou feliz por te ver. Estás pronto para a Lição 1?";
+            }
+            // 2. FEELINGS
+            else if (input.includes("how are you") || input.includes("como estas")) {
+                resEN = "I am doing great, thank you! Let's start learning. Type 'Lesson 1'.";
+                resPT = "Estou muito bem, obrigado! Vamos começar a aprender. Escreve 'Lição 1'.";
+            }
+            // 3. LESSON 1: TO BE
+            else if (input.includes("lesson 1") || input.includes("licao 1")) {
+                resEN = "Lesson 1: The Verb 'TO BE'. In English, 'Eu sou' is 'I AM'. Repeat: I am a student.";
+                resPT = "Lição 1: O Verbo 'Ser/Estar'. Em Inglês, 'Eu sou' é 'I AM'. Repete: I am a student.";
+            }
+            // 4. LESSON 2: TO HAVE
+            else if (input.includes("lesson 2") || input.includes("licao 2")) {
+                resEN = "Lesson 2: 'TO HAVE'. To say 'Eu tenho um carro', say 'I HAVE a car'.";
+                resPT = "Lição 2: 'Ter'. Para dizer 'Eu tenho um carro', diz 'I HAVE a car'.";
+            }
+            // 5. ENCOURAGEMENT
+            else if (input.includes("i am") || input.includes("i have")) {
+                resEN = "Excellent! You are speaking English perfectly!";
+                resPT = "Excelente! Estás a falar Inglês perfeitamente!";
+            }
+            // 6. DEFAULT (If the AI doesn't know)
+            else {
+                resEN = "That is interesting! Can you say that using 'I am' or 'I have'? Or type 'Lesson 1'.";
+                resPT = "Isso é interessante! Podes dizer isso usando 'I am' ou 'I have'? Ou escreve 'Lição 1'.";
             }
 
-            tela.innerHTML += "<div class='bot'><b>Teacher:</b> " + resEN + "<br>" + resPT + "</div>";
-            
-            falar(resEN, 'en-US');
-            // Delay for Portuguese speech
-            setTimeout(function(){ falar(resPT, 'pt-PT'); }, 2000);
+            // Display and Speak
+            tela.innerHTML += "<div class='bot'><b>Teacher:</b> " + resEN + "<br><small>" + resPT + "</small></div>";
+            falar(resEN);
 
             campo.value = "";
             tela.scrollTop = tela.scrollHeight;
