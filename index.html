@@ -3,34 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - Global Elite</title>
+    <title>Mestre AI - Global Elite Empire</title>
     <style>
-        :root { --gold: #ffd700; --dark: #050505; --surface: #121212; --accent: #00ffcc; --red: #ff3e3e; }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s; }
+        :root { 
+            --gold: #ffd700; --dark: #050505; --surface: #121212; 
+            --accent: #00ffcc; --rarity-legendary: #ff00ff; --rarity-elite: #0077ff; 
+        }
+        * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* PROGRESS WORLD MAP */
-        #map-overlay {
-            position: fixed; inset: 0; z-index: 2000; background: radial-gradient(circle at center, #1a1a1a, #000);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px; text-align: center;
+        /* SHOP OVERLAY */
+        #shop-overlay {
+            position: fixed; inset: 0; z-index: 2000; background: #000;
+            display: none; flex-direction: column; padding: 20px;
         }
-        .map-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px; width: 100%; max-width: 400px; }
-        .zone { 
-            background: #1a1a1a; border: 1px solid #333; padding: 20px 10px; border-radius: 15px; 
-            font-size: 10px; font-weight: bold; color: #666; position: relative;
-        }
-        .zone.unlocked { border-color: var(--gold); color: white; cursor: pointer; background: rgba(255, 215, 0, 0.05); }
-        .zone.active { box-shadow: 0 0 20px var(--gold); border-width: 2px; color: var(--gold); }
-        .zone.locked::after { content: '🔒'; position: absolute; top: 5px; right: 5px; font-size: 10px; }
+        .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .mascot-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; overflow-y: auto; flex: 1; }
+        .shop-item { background: #1a1a1a; padding: 15px; border-radius: 20px; border: 1px solid #333; text-align: center; }
+        .shop-item.owned { border-color: var(--gold); }
+        .shop-item.active { box-shadow: 0 0 15px var(--gold); }
+        .rarity { font-size: 9px; font-weight: 900; letter-spacing: 1px; margin-bottom: 5px; }
 
-        /* UI ELEMENTS */
+        /* HEADER & XP */
         header { padding: 15px 20px; background: #000; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+        
+        /* CHAT */
         #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
         .bubble { max-width: 85%; padding: 15px; border-radius: 20px; line-height: 1.4; animation: pop 0.3s ease; }
-        .bot { background: var(--surface); border: 1px solid #222; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .bot { background: var(--surface); border: 1px solid #222; align-self: flex-start; border-bottom-left-radius: 4px; display: flex; gap: 12px; }
         .user { background: var(--gold); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: bold; }
-
+        
         /* BUILDER */
         .builder { background: var(--surface); padding: 15px; border-radius: 25px 25px 0 0; border-top: 1px solid #333; max-height: 50vh; overflow-y: auto; }
         .cat-label { font-size: 10px; color: #666; text-transform: uppercase; margin: 15px 0 5px 5px; font-weight: 800; letter-spacing: 1px; }
@@ -38,85 +40,164 @@
         .chip { background: #1a1a1a; padding: 12px 18px; border-radius: 12px; border: 1px solid #333; white-space: nowrap; cursor: pointer; font-size: 13px; color: #bbb; }
         .chip:active { background: var(--gold); color: black; transform: scale(0.95); }
 
+        /* INPUT AREA */
         .input-group { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 20px; border: 1px solid #333; margin-top: 10px; }
         input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; }
-        .send-btn { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 20px; }
+        .send-btn { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 20px; color: black; }
+        
+        /* THE HINT BUTTON */
+        #hint-btn { border: none; background: transparent; color: var(--accent); font-weight: 900; font-size: 12px; letter-spacing: 1px; cursor: pointer; }
+        #hint-btn.legendary { color: var(--rarity-legendary); text-shadow: 0 0 10px var(--rarity-legendary); }
 
         @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
 </head>
 <body>
 
-    <div id="map-overlay">
-        <h1 style="color:var(--gold); margin:0; letter-spacing: -1px;">CONQUER ANGOLA</h1>
-        <p style="color:#888;">Master Luanda to unlock the Provinces</p>
-        
-        <div class="map-grid">
-            <div class="zone unlocked active" onclick="startLevel('Ilha do Cabo')">ILHA DO CABO<br><small>Level 1-2</small></div>
-            <div class="zone unlocked" onclick="startLevel('Ingombota')">INGOMBOTA<br><small>Level 3</small></div>
-            <div class="zone locked">MAIANGA</div>
-            <div class="zone locked">SAMBIZANGA</div>
-            <div class="zone locked">RANGEL</div>
-            <div class="zone locked">TALATONA</div>
-            <div class="zone locked">VIANA</div>
-            <div class="zone locked">BELAS</div>
-            <div class="zone locked">CAZENGA</div>
+    <div id="shop-overlay">
+        <div class="shop-header">
+            <h1 style="color:var(--gold); margin:0;">MASCOT EMPIRE</h1>
+            <div style="display:flex; gap:10px;">
+                <div style="font-weight: 900; color: var(--gold);">💰 <span id="shop-coins">2500</span> Kz</div>
+                <button onclick="toggleShop()" style="background:#222; border:none; color:white; padding:5px 10px; border-radius:8px;">BACK</button>
+            </div>
         </div>
-        <button onclick="this.parentElement.style.display='none'" style="margin-top:30px; padding:18px 50px; border-radius:20px; background:var(--gold); border:none; font-weight:900; box-shadow: 0 10px 20px rgba(255,215,0,0.2);">CONTINUE MISSION</button>
+        <div class="mascot-list" id="shop-list">
+            </div>
     </div>
 
     <header>
-        <div style="font-weight: 900; color: var(--gold); font-size: 18px;">💰 <span id="coins">1200</span> <small>Kz</small></div>
-        <div style="font-weight: 800; color: var(--accent);">📍 <span id="current-zone">Ilha do Cabo</span></div>
+        <button onclick="toggleShop()" style="background:transparent; border:none; color:white;">🛍️ SHOP</button>
+        <div style="font-weight: 900; color: var(--gold); font-size: 18px;">💰 <span id="coins">2500</span> <small>Kz</small></div>
+        <button id="hint-btn" onclick="useHint()">⚡ HINT (Basic)</button>
     </header>
 
     <div id="chat">
         <div class="bubble bot">
-            <b>Mestre Palanca:</b> 🦌<br>
-            You have entered <b>Ingombota (Lesson 3)</b>! Today's mission: <b>The Grocery Store</b>. How do you ask for food in English?
+            <div style="font-size:32px; filter:drop-shadow(0 0 5px var(--gold));" id="mestre-icon">🦌</div>
+            <div>
+                <b>Mestre:</b><br>
+                Welcome to <b>4 de Fevereiro Airport (Lesson 4)</b>, Boss! Mission: <b>Check-In & Customs</b>. Handle the questions.
+            </div>
         </div>
     </div>
 
     <div class="builder">
-        <div class="cat-label">Shopping Actions</div>
+        <div class="cat-label">Airport Actions</div>
         <div class="chip-scroll" id="row-actions"></div>
         
-        <div class="cat-label">Quantities</div>
-        <div class="chip-scroll" id="row-qty"></div>
+        <div class="cat-label">My Documents</div>
+        <div class="chip-scroll" id="row-docs"></div>
 
-        <div class="cat-label">Products</div>
-        <div class="chip-scroll" id="row-items"></div>
+        <div class="cat-label">Customs / Customs Items</div>
+        <div class="chip-scroll" id="row-customs"></div>
 
-        <div class="cat-label">Pricing & Help</div>
+        <div class="cat-label">Common Help</div>
         <div class="chip-scroll" id="row-help"></div>
 
         <div class="input-group">
-            <input type="text" id="main-input" placeholder="Build your shopping sentence..." readonly>
+            <input type="text" id="main-input" placeholder="Prepare your travel documents..." readonly>
             <button class="send-btn" onclick="process()">➔</button>
         </div>
     </div>
 
     <script>
-        let coins = 1200;
+        // MASCOT & ECONOMY SYSTEM
+        let coins = 2500;
+        let inventory = {
+            owned: ['palanca'],
+            active: 'palanca'
+        };
+
+        const mascots = {
+            palanca: { icon: '🦌', name: 'Original Palanca', price: 0, rarity: 'DEFAULT', hint: 'Highlights main word.' },
+            elite_lion: { icon: '🦁', name: 'Elite Muscle Lion', price: 5000, rarity: 'ELITE', hint: 'Shows basic grammar rule.' },
+            albino_lion: { icon: '⚪🦁', name: 'Legendary Albino Lion', price: 15000, rarity: 'LEGENDARY', hint: 'Provides full sentence structure.' }
+        };
+
         const vocab = {
-            actions: ["I want", "I need", "I am looking for", "Can I have", "I would like", "Do you have"],
-            qty: ["one kilo of", "two kilos of", "a bag of", "half a kilo of", "a dozen", "some", "a bottle of"],
-            items: ["rice", "beans", "sugar", "bread", "milk", "eggs", "meat", "chicken", "fish", "water", "oil", "flour"],
-            help: ["How much is it?", "Is it on sale?", "Where is the", "expensive", "cheap", "thank you", "Keep the change"]
+            actions: ["I have", "I am", "I would like to", "Can I check", "Here is"],
+            docs: ["my passport", "my visa", "my boarding pass", "my ticket", "my ID"],
+            customs: ["nothing to declare", "some gifts", "alcohol", "perfume", "electronics"],
+            help: ["I am travelling for business", "I am visiting family", "thank you", "Keep the change"]
         };
 
-        const dict = {
-            "i want": "eu quero", "i need": "eu preciso", "rice": "arroz", "beans": "feijão",
-            "how much is": "quanto custa", "meat": "carne", "chicken": "frango", "milk": "leite",
-            "expensive": "caro", "cheap": "barato", "thank you": "obrigado", "dozen": "dúzia"
-        };
+        const dict = { "passport": "passaporte", "visa": "visto", "have": "tenho", "declare": "declarar" };
 
+        function updateMascotUI() {
+            const m = mascots[inventory.active];
+            document.getElementById('mestre-icon').innerText = m.icon;
+            const hintBtn = document.getElementById('hint-btn');
+            hintBtn.innerText = `⚡ HINT (${m.rarity})`;
+            hintBtn.className = m.rarity.toLowerCase();
+        }
+
+        function useHint() {
+            const m = mascots[inventory.active];
+            const chat = document.getElementById('chat');
+            chat.innerHTML += `<div class="bubble bot" style="border-color:${m.rarity==='LEGENDARY'?'var(--rarity-legendary)':''}"><b>${m.name} Hint:</b> ${m.hint}</div>`;
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function toggleShop() {
+            const overlay = document.getElementById('shop-overlay');
+            overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+            if (overlay.style.display === 'flex') renderShop();
+        }
+
+        function renderShop() {
+            document.getElementById('shop-coins').innerText = coins;
+            const list = document.getElementById('shop-list');
+            list.innerHTML = "";
+            for (let id in mascots) {
+                const m = mascots[id];
+                const isOwned = inventory.owned.includes(id);
+                const isActive = inventory.active === id;
+                let btnHtml = isOwned ? 
+                    (isActive ? `<button style="background:var(--accent); border:none; width:100%;" disabled>EQUIPPED</button>` : `<button onclick="equip('${id}')" style="background:white; color:black; border:none; width:100%;">EQUIP</button>`) :
+                    `<button onclick="buy('${id}')" style="background:var(--gold); color:black; border:none; width:100%;">BUY ${m.price} Kz</button>`;
+
+                list.innerHTML += `
+                    <div class="shop-item ${isOwned ? 'owned' : ''} ${isActive ? 'active' : ''}">
+                        <div class="rarity ${m.rarity.toLowerCase()}" style="color:${getHintColor(m.rarity)}">${m.rarity}</div>
+                        <div style="font-size:40px; filter:drop-shadow(0 0 10px ${getHintColor(m.rarity)})">${m.icon}</div>
+                        <div style="font-weight:bold; color:white; margin:5px 0;">${m.name}</div>
+                        <div style="font-size:10px; color:#888; margin-bottom:10px;">Ability: ${m.hint}</div>
+                        ${btnHtml}
+                    </div>`;
+            }
+        }
+
+        function buy(id) {
+            const m = mascots[id];
+            if (coins >= m.price) {
+                coins -= m.price;
+                inventory.owned.push(id);
+                document.getElementById('coins').innerText = coins;
+                renderShop();
+            } else { alert("Not enough Kwanza, Boss!"); }
+        }
+
+        function equip(id) {
+            inventory.active = id;
+            updateMascotUI();
+            renderShop();
+        }
+
+        function getHintColor(r) {
+            if (r === 'LEGENDARY') return 'var(--rarity-legendary)';
+            if (r === 'ELITE') return 'var(--rarity-elite)';
+            return '#aaa';
+        }
+
+        // CHAT & BUILDER (unchanged logic)
         function render() {
             for (let cat in vocab) {
                 document.getElementById('row-' + cat).innerHTML = vocab[cat].map(w => 
                     `<div class="chip" onclick="add('${w}')">${w}</div>`
                 ).join('');
             }
+            updateMascotUI();
         }
 
         function add(w) { 
@@ -127,49 +208,17 @@
         function process() {
             let val = document.getElementById('main-input').value.trim();
             if(!val) return;
-
             let chat = document.getElementById('chat');
             chat.innerHTML += `<div class="bubble user">${val}</div>`;
-
-            // Logic for translation (English to Portuguese for the bot response)
-            let translation = "Translation ready...";
-            let words = val.toLowerCase();
-            
-            // Basic pattern matching for grocery context
-            for(let key in dict) {
-                if(words.includes(key)) {
-                    translation = val.toLowerCase().replace(key, "<b>" + dict[key] + "</b>");
-                }
-            }
-
-            coins += 40;
+            let translation = "Airport security logic processing...";
+            for(let key in dict) { if(val.toLowerCase().includes(key)) translation = val.toLowerCase().replace(key, "<b>" + dict[key] + "</b>"); }
+            coins += 60;
             document.getElementById('coins').innerText = coins;
-
-            setTimeout(() => {
-                chat.innerHTML += `
-                    <div class="bubble bot">
-                        <small style="color:var(--accent)">MESTRE TRANSLATION:</small><br>
-                        ${translation}<br>
-                        <div style="margin-top:10px; font-size:10px; color:var(--gold); font-weight:bold;">+40 Kz EARNED IN INGOMBOTA!</div>
-                    </div>`;
-                chat.scrollTop = chat.scrollHeight;
-                speak(val);
-            }, 600);
-
+            setTimeout(() => { chat.innerHTML += `<div class="bubble bot"><small style="color:var(--accent)">SECURITY AGENT TRANSLATION:</small><br>${translation}<br><div style="margin-top:10px; font-size:10px; color:var(--gold);">+60 Kz EARNED AT 4 DE FEVEREIRO!</div></div>`; chat.scrollTop = chat.scrollHeight; speak(val); }, 600);
             document.getElementById('main-input').value = "";
         }
 
-        function startLevel(zone) {
-            document.getElementById('current-zone').innerText = zone;
-            document.getElementById('map-overlay').style.display = 'none';
-        }
-
-        function speak(t) {
-            window.speechSynthesis.cancel();
-            let m = new SpeechSynthesisUtterance(t);
-            m.lang = 'en-US';
-            window.speechSynthesis.speak(m);
-        }
+        function speak(t) { window.speechSynthesis.cancel(); let m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; window.speechSynthesis.speak(m); }
 
         render();
     </script>
