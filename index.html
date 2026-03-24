@@ -3,169 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - Elite Pattern Engine</title>
+    <title>Mestre AI - Mega Build</title>
     <style>
-        :root { --gold: #ffd700; --dark: #050505; --surface: #121212; --accent: #00ffcc; --red: #ff4444; }
+        :root { --gold: #ffd700; --dark: #050505; --surface: #121212; --accent: #00ffcc; --boss: #ff3e3e; }
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* HEADER & XP */
+        /* ELITE UI ELEMENTS */
         header { padding: 15px 20px; background: #000; border-bottom: 1px solid #222; }
-        .stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; font-weight: 800; }
-        .xp-container { width: 100%; height: 8px; background: #222; border-radius: 10px; }
-        #xp-bar { width: 20%; height: 100%; background: linear-gradient(90deg, var(--gold), #fff); border-radius: 10px; box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+        .stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 800; }
+        .xp-container { width: 100%; height: 6px; background: #222; border-radius: 10px; }
+        #xp-bar { width: 10%; height: 100%; background: linear-gradient(90deg, var(--gold), #fff); border-radius: 10px; }
 
-        /* LEADERBOARD DRAWER (SNEAK PEEK) */
-        .leaderboard-preview { background: #1a1a1a; padding: 10px 20px; font-size: 11px; display: flex; gap: 15px; overflow-x: auto; border-bottom: 1px solid #333; color: #888; }
-        .rank-item { white-space: nowrap; }
-        .rank-item.me { color: var(--gold); font-weight: bold; }
-
-        /* CHAT AREA */
-        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .bubble { max-width: 85%; padding: 15px; border-radius: 22px; line-height: 1.4; animation: slideUp 0.4s ease; }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; background: radial-gradient(circle at bottom, #111 0%, #050505 100%); }
+        .bubble { max-width: 85%; padding: 15px; border-radius: 20px; line-height: 1.4; animation: pop 0.3s ease; position: relative; }
         .bot { background: var(--surface); border: 1px solid #222; align-self: flex-start; border-bottom-left-radius: 4px; }
         .user { background: var(--gold); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: bold; }
+        .boss-msg { border: 2px solid var(--boss); box-shadow: 0 0 15px rgba(255, 62, 62, 0.3); }
 
-        /* CHIP BUILDER */
-        .builder { background: var(--surface); padding: 20px; border-radius: 30px 30px 0 0; border-top: 1px solid #333; }
-        .chip-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+        /* SCROLLABLE CATEGORIES */
+        .builder { background: var(--surface); padding: 15px; border-radius: 25px 25px 0 0; border-top: 1px solid #333; max-height: 45vh; overflow-y: auto; }
+        .cat-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin: 10px 0 5px 5px; }
+        .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .chip-scroll::-webkit-scrollbar { display: none; }
-        .chip { background: #222; padding: 12px 20px; border-radius: 14px; border: 1px solid #333; white-space: nowrap; cursor: pointer; font-size: 14px; }
+        .chip { background: #1a1a1a; padding: 10px 16px; border-radius: 12px; border: 1px solid #333; white-space: nowrap; cursor: pointer; font-size: 13px; }
         .chip:active { background: var(--gold); color: black; transform: scale(0.9); }
         .chip.verb { border-color: var(--accent); color: var(--accent); }
+        .chip.place { border-color: #55aaff; color: #55aaff; }
 
-        .input-group { display: flex; gap: 10px; background: #000; padding: 8px; border-radius: 20px; border: 1px solid #333; }
-        input { flex: 1; background: transparent; border: none; color: white; padding-left: 10px; font-size: 16px; outline: none; }
-        .send-btn { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; }
+        .input-group { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 20px; border: 1px solid #333; margin-top: 10px; }
+        input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; }
+        .send-btn { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
 </head>
 <body>
 
     <header>
         <div class="stats">
-            <span>🔥 STREAK: 3</span>
-            <span style="color:var(--gold)">💰 <span id="coins">150</span> Kz</span>
-            <span id="rank-text" style="color:var(--accent)">#12 LUANDA</span>
+            <span>🔥 STREAK: 5</span>
+            <span style="color:var(--gold)">💰 <span id="coins">250</span> Kz</span>
+            <span style="color:var(--accent)">RANK: #8 LUANDA</span>
         </div>
         <div class="xp-container"><div id="xp-bar"></div></div>
     </header>
 
-    <div class="leaderboard-preview">
-        <span class="rank-item">1. Paulo (8.5k)</span>
-        <span class="rank-item">2. Maria (7.2k)</span>
-        <span class="rank-item me">12. VOCÊ (150)</span>
-        <span class="rank-item">13. Josefa (140)</span>
-    </div>
-
     <div id="chat">
         <div class="bubble bot">
             <b>Mestre Palanca:</b> 🦌<br>
-            Vamos praticar o <b>Verb to Be</b>. Tenta formar frases no Passado, Presente ou Futuro!
+            Bem-vindo ao nível Mega! Use as novas categorias abaixo para criar frases complexas.
         </div>
     </div>
 
     <div class="builder">
+        <div class="cat-label">Subjects (Sujeitos)</div>
         <div class="chip-scroll" id="row-who"></div>
+        
+        <div class="cat-label">Verb To Be (Tempos)</div>
         <div class="chip-scroll" id="row-verb"></div>
-        <div class="chip-scroll" id="row-obj"></div>
+
+        <div class="cat-label">Feelings & States (Estados)</div>
+        <div class="chip-scroll" id="row-feel"></div>
+
+        <div class="cat-label">Places (Lugares)</div>
+        <div class="chip-scroll" id="row-place"></div>
+
+        <div class="cat-label">Time (Tempo)</div>
+        <div class="chip-scroll" id="row-time"></div>
+
         <div class="input-group">
-            <input type="text" id="main-input" placeholder="Toca nos blocos..." readonly>
+            <input type="text" id="main-input" placeholder="Construa aqui..." readonly>
             <button class="send-btn" onclick="process()">➔</button>
         </div>
     </div>
 
     <script>
-        let coins = 150;
-        let xp = 20;
+        let score = 0;
+        let coins = 250;
+        let isBossBattle = false;
+        let bossTarget = "";
 
-        // THE "BRAIN" - Logic for any combination
-        const brain = {
-            who: { "I": "Eu", "You": "Tu", "He": "Ele", "She": "Ela", "We": "Nós", "They": "Eles" },
-            be: {
-                "am": "estou/sou", "is": "está/é", "are": "estás/és/estão",
-                "was": "estava/era", "were": "estavas/eras/estavam",
-                "will be": "estarei/serei"
-            },
-            neg: { "not": "não" },
-            obj: { "happy": "feliz", "hungry": "com fome", "late": "atrasado(a)", "at work": "no trabalho", "learning": "aprendendo" }
+        const vocabulary = {
+            who: ["I", "You", "He", "She", "It", "We", "They", "My friend", "The driver", "My boss", "The passenger"],
+            verb: ["am", "is", "are", "was", "were", "will be", "am not", "is not", "are not"],
+            feel: ["happy", "sad", "hungry", "tired", "angry", "busy", "ready", "sick", "worried", "excited", "lost"],
+            place: ["at home", "at work", "at the airport", "in Luanda", "at the office", "at school", "in the car", "near the bank"],
+            time: ["now", "yesterday", "tomorrow", "tonight", "later", "soon", "always", "every day"]
         };
 
-        const chips = {
-            who: ["I", "You", "He", "She", "We", "They"],
-            verb: ["am", "is", "are", "was", "were", "will be", "not"],
-            obj: ["happy", "hungry", "late", "at work", "learning"]
+        const dict = {
+            "i": "Eu", "you": "Tu", "he": "Ele", "she": "Ela", "we": "Nós", "they": "Eles",
+            "my friend": "Meu amigo", "the driver": "O motorista", "my boss": "Meu chefe",
+            "am": "estou/sou", "is": "está/é", "are": "estão/são", "was": "estava/era", "were": "estavam/eram", "will be": "estarei/serei",
+            "not": "não", "at home": "em casa", "at work": "no trabalho", "busy": "ocupado", "lost": "perdido"
         };
 
         function render() {
-            document.getElementById('row-who').innerHTML = chips.who.map(c => `<div class="chip" onclick="add('${c}')">${c}</div>`).join('');
-            document.getElementById('row-verb').innerHTML = chips.verb.map(c => `<div class="chip verb" onclick="add('${c}')">${c}</div>`).join('');
-            document.getElementById('row-obj').innerHTML = chips.obj.map(c => `<div class="chip" onclick="add('${c}')">${c}</div>`).join('');
-        }
-
-        function add(val) {
-            let i = document.getElementById('main-input');
-            i.value += (i.value ? " " : "") + val;
-        }
-
-        function translateBrain(sentence) {
-            let words = sentence.toLowerCase().split(" ");
-            let result = [];
-            
-            // Intelligence: It maps English categories to Portuguese structures
-            let hasNot = words.includes("not");
-            
-            words.forEach((w, index) => {
-                if (w === "not") return; // Skip and handle in verb
-                
-                // Find translation in any category
-                let found = false;
-                for (let cat in brain) {
-                    // Check if word exists in brain (with simple typo handling: startsWith)
-                    for (let eng in brain[cat]) {
-                        if (eng.toLowerCase() === w || (w.length > 3 && eng.toLowerCase().startsWith(w.substring(0,3)))) {
-                            let trans = brain[cat][eng];
-                            if (cat === 'be' && hasNot) trans = "não " + trans;
-                            result.push(trans);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) break;
+            for (let cat in vocabulary) {
+                const el = document.getElementById('row-' + cat);
+                if (el) {
+                    el.innerHTML = vocabulary[cat].map(w => `<div class="chip ${cat==='verb'?'verb':''} ${cat==='place'?'place':''}" onclick="add('${w}')">${w}</div>`).join('');
                 }
-            });
-            return result.join(" ");
+            }
+        }
+
+        function add(w) { 
+            let i = document.getElementById('main-input');
+            i.value += (i.value ? " " : "") + w; 
+        }
+
+        function translateSimple(text) {
+            return text.toLowerCase().split(" ").map(w => dict[w] || w).join(" ");
         }
 
         function process() {
             let val = document.getElementById('main-input').value.trim();
             if(!val) return;
 
-            let translation = translateBrain(val);
-
-            // Update UI
             let chat = document.getElementById('chat');
             chat.innerHTML += `<div class="bubble user">${val}</div>`;
-            
-            // Gamification
-            coins += 25;
-            xp += 15;
+
+            if(isBossBattle) {
+                checkBoss(val);
+                return;
+            }
+
+            // Normal Mode
+            score++;
+            coins += 30;
             document.getElementById('coins').innerText = coins;
-            document.getElementById('xp-bar').style.width = (xp % 100) + "%";
+            document.getElementById('xp-bar').style.width = (score * 10) % 100 + "%";
 
             setTimeout(() => {
+                let trans = translateSimple(val);
                 chat.innerHTML += `
                     <div class="bubble bot">
-                        <small style="color:var(--accent)">MESTRE TRADUÇÃO:</small><br>
-                        <b>${translation}</b><br>
-                        <div style="margin-top:8px; font-size:10px; color:var(--gold)">+25 Kz conquistados!</div>
+                        <small style="color:var(--accent)">TRADUÇÃO:</small><br>
+                        <b>${trans}</b>
                     </div>`;
                 chat.scrollTop = chat.scrollHeight;
                 speak(val);
+
+                if(score % 5 === 0) startBossBattle();
             }, 600);
 
             document.getElementById('main-input').value = "";
+        }
+
+        function startBossBattle() {
+            isBossBattle = true;
+            bossTarget = "I was at home";
+            setTimeout(() => {
+                let chat = document.getElementById('chat');
+                chat.innerHTML += `
+                    <div class="bubble bot boss-msg">
+                        <b style="color:var(--boss)">BOSS BATTLE! 🥊</b><br>
+                        Traduza para Inglês:<br>
+                        <b style="font-size:18px;">"Eu estava em casa"</b>
+                    </div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 1000);
+        }
+
+        function checkBoss(val) {
+            let chat = document.getElementById('chat');
+            if(val.toLowerCase() === bossTarget.toLowerCase()) {
+                coins += 200;
+                chat.innerHTML += `
+                    <div class="bubble bot" style="border-color:var(--accent)">
+                        <b style="color:var(--accent)">VICTORY! 🏆</b><br>
+                        Excepcional! Ganhaste 200 Kz de bónus.
+                    </div>`;
+                isBossBattle = false;
+            } else {
+                chat.innerHTML += `<div class="bubble bot" style="border-color:var(--red)">Errado! Tenta novamente o desafio do Boss.</div>`;
+            }
+            document.getElementById('coins').innerText = coins;
+            document.getElementById('main-input').value = "";
+            chat.scrollTop = chat.scrollHeight;
         }
 
         function speak(t) {
