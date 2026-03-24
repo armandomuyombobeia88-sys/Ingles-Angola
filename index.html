@@ -3,185 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - Mega Build</title>
+    <title>Mestre AI - Elite Lesson 2</title>
     <style>
-        :root { --gold: #ffd700; --dark: #050505; --surface: #121212; --accent: #00ffcc; --boss: #ff3e3e; }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        :root { --gold: #ffd700; --dark: #050505; --surface: #121212; --accent: #00ffcc; --blue: #3498db; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s; }
+        body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* ELITE UI ELEMENTS */
-        header { padding: 15px 20px; background: #000; border-bottom: 1px solid #222; }
-        .stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 800; }
-        .xp-container { width: 100%; height: 6px; background: #222; border-radius: 10px; }
-        #xp-bar { width: 10%; height: 100%; background: linear-gradient(90deg, var(--gold), #fff); border-radius: 10px; }
+        /* ELITE HOME SCREEN */
+        #home-screen {
+            position: fixed; inset: 0; z-index: 1000;
+            background: radial-gradient(circle at top right, #1a1a1a, #000);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px;
+        }
+        .boss-title {
+            font-size: 42px; font-weight: 900; color: var(--gold);
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.4); margin: 0;
+            letter-spacing: -1px; line-height: 1;
+        }
+        .welcome-tag { color: var(--accent); font-weight: bold; letter-spacing: 3px; font-size: 12px; margin-bottom: 30px; }
+        
+        .lesson-card {
+            width: 90%; max-width: 350px; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 30px;
+            backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .start-btn {
+            background: var(--gold); color: #000; border: none; padding: 18px 40px;
+            border-radius: 20px; font-weight: 900; font-size: 16px; width: 100%;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+        }
 
-        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; background: radial-gradient(circle at bottom, #111 0%, #050505 100%); }
-        .bubble { max-width: 85%; padding: 15px; border-radius: 20px; line-height: 1.4; animation: pop 0.3s ease; position: relative; }
-        .bot { background: var(--surface); border: 1px solid #222; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .user { background: var(--gold); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: bold; }
-        .boss-msg { border: 2px solid var(--boss); box-shadow: 0 0 15px rgba(255, 62, 62, 0.3); }
-
-        /* SCROLLABLE CATEGORIES */
-        .builder { background: var(--surface); padding: 15px; border-radius: 25px 25px 0 0; border-top: 1px solid #333; max-height: 45vh; overflow-y: auto; }
-        .cat-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin: 10px 0 5px 5px; }
-        .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        /* APP INTERFACE */
+        #app { display: none; flex-direction: column; height: 100vh; opacity: 0; }
+        header { padding: 15px 20px; background: #000; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* BUILDER SECTION */
+        .builder { background: var(--surface); border-radius: 30px 30px 0 0; padding: 15px; border-top: 1px solid #333; overflow-y: auto; flex-shrink: 0; max-height: 60vh; }
+        .row-label { font-size: 10px; color: #666; text-transform: uppercase; margin: 15px 0 5px 5px; font-weight: 800; }
+        .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
         .chip-scroll::-webkit-scrollbar { display: none; }
-        .chip { background: #1a1a1a; padding: 10px 16px; border-radius: 12px; border: 1px solid #333; white-space: nowrap; cursor: pointer; font-size: 13px; }
-        .chip:active { background: var(--gold); color: black; transform: scale(0.9); }
-        .chip.verb { border-color: var(--accent); color: var(--accent); }
-        .chip.place { border-color: #55aaff; color: #55aaff; }
+        .chip { background: #1a1a1a; padding: 10px 16px; border-radius: 12px; border: 1px solid #333; white-space: nowrap; cursor: pointer; font-size: 13px; color: #ccc; }
+        .chip:active { background: var(--gold); color: #000; }
+        .chip.adj { border-color: var(--blue); color: var(--blue); }
 
-        .input-group { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 20px; border: 1px solid #333; margin-top: 10px; }
-        input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; }
-        .send-btn { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 80%; padding: 15px; border-radius: 20px; font-size: 15px; animation: pop 0.3s forwards; }
+        .bot { background: #1a1a1a; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #333; }
+        .user { background: var(--gold); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: bold; }
 
-        @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .input-box { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 20px; border: 1px solid #333; margin-top: 10px; }
+        input { flex: 1; background: transparent; border: none; color: white; outline: none; }
+        
+        @keyframes pop { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="stats">
-            <span>🔥 STREAK: 5</span>
-            <span style="color:var(--gold)">💰 <span id="coins">250</span> Kz</span>
-            <span style="color:var(--accent)">RANK: #8 LUANDA</span>
-        </div>
-        <div class="xp-container"><div id="xp-bar"></div></div>
-    </header>
-
-    <div id="chat">
-        <div class="bubble bot">
-            <b>Mestre Palanca:</b> 🦌<br>
-            Bem-vindo ao nível Mega! Use as novas categorias abaixo para criar frases complexas.
+    <div id="home-screen">
+        <div class="welcome-tag">BEM-VINDO, BOSS</div>
+        <h1 class="boss-title">MESTRE AI<br>ELITE ACADEMY</h1>
+        <p style="color: #888; margin-top: 10px;">Your English empire starts here. 🇦🇴</p>
+        <div style="height: 40px;"></div>
+        <div class="lesson-card">
+            <h3 style="margin: 0; color: var(--gold);">LESSON 02</h3>
+            <p style="font-size: 14px; color: #ccc;">The 7 Types of Adjectives & Family Expansion</p>
+            <button class="start-btn" onclick="startApp()">START MISSION</button>
         </div>
     </div>
 
-    <div class="builder">
-        <div class="cat-label">Subjects (Sujeitos)</div>
-        <div class="chip-scroll" id="row-who"></div>
-        
-        <div class="cat-label">Verb To Be (Tempos)</div>
-        <div class="chip-scroll" id="row-verb"></div>
+    <div id="app">
+        <header>
+            <div style="font-weight: 800; color: var(--gold);">💰 <span id="coins">500</span> Kz</div>
+            <div style="font-weight: 800; color: var(--accent);">🔥 STREAK: 1</div>
+        </header>
 
-        <div class="cat-label">Feelings & States (Estados)</div>
-        <div class="chip-scroll" id="row-feel"></div>
+        <div id="chat">
+            <div class="msg bot">
+                <b>Mestre Palanca:</b> 🦌<br>
+                Welcome back! Lesson 2 is huge. We have <b>Adjectives</b> (colors, sizes, opinions) and <b>Family</b>. Build a sentence!
+            </div>
+        </div>
 
-        <div class="cat-label">Places (Lugares)</div>
-        <div class="chip-scroll" id="row-place"></div>
-
-        <div class="cat-label">Time (Tempo)</div>
-        <div class="chip-scroll" id="row-time"></div>
-
-        <div class="input-group">
-            <input type="text" id="main-input" placeholder="Construa aqui..." readonly>
-            <button class="send-btn" onclick="process()">➔</button>
+        <div class="builder">
+            <div id="categories-container"></div>
+            
+            <div class="input-box">
+                <input type="text" id="words-in" placeholder="..." readonly>
+                <button onclick="send()" style="background:var(--gold); border:none; border-radius:15px; padding:0 20px; font-weight:bold;">➔</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let score = 0;
-        let coins = 250;
-        let isBossBattle = false;
-        let bossTarget = "";
-
-        const vocabulary = {
-            who: ["I", "You", "He", "She", "It", "We", "They", "My friend", "The driver", "My boss", "The passenger"],
-            verb: ["am", "is", "are", "was", "were", "will be", "am not", "is not", "are not"],
-            feel: ["happy", "sad", "hungry", "tired", "angry", "busy", "ready", "sick", "worried", "excited", "lost"],
-            place: ["at home", "at work", "at the airport", "in Luanda", "at the office", "at school", "in the car", "near the bank"],
-            time: ["now", "yesterday", "tomorrow", "tonight", "later", "soon", "always", "every day"]
+        const vocab = {
+            "Family (Família)": ["My father", "My mother", "My brother", "My sister", "My uncle", "My aunt", "My cousin"],
+            "Verb To Be": ["is", "is not", "are", "are not", "was", "will be"],
+            "Colors (Cores)": ["red", "blue", "green", "yellow", "black", "white", "purple"],
+            "Feelings (Sentimentos)": ["proud", "confused", "excited", "brave", "calm", "lonely"],
+            "Weather (Tempo)": ["hot", "cold", "sunny", "rainy", "windy", "cloudy"],
+            "Opinion (Opinião)": ["beautiful", "expensive", "smart", "funny", "strange"],
+            "Size (Tamanho)": ["huge", "tiny", "short", "tall", "wide"]
         };
 
-        const dict = {
-            "i": "Eu", "you": "Tu", "he": "Ele", "she": "Ela", "we": "Nós", "they": "Eles",
-            "my friend": "Meu amigo", "the driver": "O motorista", "my boss": "Meu chefe",
-            "am": "estou/sou", "is": "está/é", "are": "estão/são", "was": "estava/era", "were": "estavam/eram", "will be": "estarei/serei",
-            "not": "não", "at home": "em casa", "at work": "no trabalho", "busy": "ocupado", "lost": "perdido"
+        const translations = {
+            "father": "pai", "mother": "mãe", "brother": "irmão", "sister": "irmã",
+            "is": "é/está", "are": "são/estão", "red": "vermelho", "blue": "azul",
+            "proud": "orgulhoso", "hot": "quente", "cold": "frio", "huge": "gigante"
         };
 
-        function render() {
-            for (let cat in vocabulary) {
-                const el = document.getElementById('row-' + cat);
-                if (el) {
-                    el.innerHTML = vocabulary[cat].map(w => `<div class="chip ${cat==='verb'?'verb':''} ${cat==='place'?'place':''}" onclick="add('${w}')">${w}</div>`).join('');
-                }
+        function startApp() {
+            document.getElementById('home-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('home-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'flex';
+                document.getElementById('app').style.opacity = '1';
+                renderChips();
+            }, 300);
+        }
+
+        function renderChips() {
+            const container = document.getElementById('categories-container');
+            for (let cat in vocab) {
+                container.innerHTML += `<div class="row-label">${cat}</div>`;
+                let row = document.createElement('div');
+                row.className = "chip-scroll";
+                vocab[cat].forEach(word => {
+                    row.innerHTML += `<div class="chip" onclick="add('${word}')">${word}</div>`;
+                });
+                container.appendChild(row);
             }
         }
 
         function add(w) { 
-            let i = document.getElementById('main-input');
+            let i = document.getElementById('words-in');
             i.value += (i.value ? " " : "") + w; 
         }
 
-        function translateSimple(text) {
-            return text.toLowerCase().split(" ").map(w => dict[w] || w).join(" ");
-        }
-
-        function process() {
-            let val = document.getElementById('main-input').value.trim();
+        function send() {
+            const val = document.getElementById('words-in').value;
             if(!val) return;
-
+            
             let chat = document.getElementById('chat');
-            chat.innerHTML += `<div class="bubble user">${val}</div>`;
-
-            if(isBossBattle) {
-                checkBoss(val);
-                return;
-            }
-
-            // Normal Mode
-            score++;
-            coins += 30;
-            document.getElementById('coins').innerText = coins;
-            document.getElementById('xp-bar').style.width = (score * 10) % 100 + "%";
+            chat.innerHTML += `<div class="msg user">${val}</div>`;
+            
+            // Artificial "Smart" translation
+            let ptParts = val.toLowerCase().split(" ").map(w => translations[w] || w);
+            let pt = ptParts.join(" ");
 
             setTimeout(() => {
-                let trans = translateSimple(val);
-                chat.innerHTML += `
-                    <div class="bubble bot">
-                        <small style="color:var(--accent)">TRADUÇÃO:</small><br>
-                        <b>${trans}</b>
-                    </div>`;
+                chat.innerHTML += `<div class="msg bot"><b>Mestre:</b> ${pt}<br><small style="color:var(--gold)">+50 Kz EARNED</small></div>`;
                 chat.scrollTop = chat.scrollHeight;
                 speak(val);
+            }, 500);
 
-                if(score % 5 === 0) startBossBattle();
-            }, 600);
-
-            document.getElementById('main-input').value = "";
-        }
-
-        function startBossBattle() {
-            isBossBattle = true;
-            bossTarget = "I was at home";
-            setTimeout(() => {
-                let chat = document.getElementById('chat');
-                chat.innerHTML += `
-                    <div class="bubble bot boss-msg">
-                        <b style="color:var(--boss)">BOSS BATTLE! 🥊</b><br>
-                        Traduza para Inglês:<br>
-                        <b style="font-size:18px;">"Eu estava em casa"</b>
-                    </div>`;
-                chat.scrollTop = chat.scrollHeight;
-            }, 1000);
-        }
-
-        function checkBoss(val) {
-            let chat = document.getElementById('chat');
-            if(val.toLowerCase() === bossTarget.toLowerCase()) {
-                coins += 200;
-                chat.innerHTML += `
-                    <div class="bubble bot" style="border-color:var(--accent)">
-                        <b style="color:var(--accent)">VICTORY! 🏆</b><br>
-                        Excepcional! Ganhaste 200 Kz de bónus.
-                    </div>`;
-                isBossBattle = false;
-            } else {
-                chat.innerHTML += `<div class="bubble bot" style="border-color:var(--red)">Errado! Tenta novamente o desafio do Boss.</div>`;
-            }
-            document.getElementById('coins').innerText = coins;
-            document.getElementById('main-input').value = "";
-            chat.scrollTop = chat.scrollHeight;
+            document.getElementById('words-in').value = "";
         }
 
         function speak(t) {
@@ -190,8 +166,6 @@
             m.lang = 'en-US';
             window.speechSynthesis.speak(m);
         }
-
-        render();
     </script>
 </body>
 </html>
