@@ -15,8 +15,8 @@
     </style>
 </head>
 <body>
-    <h3 style="text-align:center; color:#ffd700;">MESTRE AI ELITE 🇦🇴</h3>
-    <div id="chat"><div class="bot"><b>Mestre:</b> Ready for Lesson 1! / Pronto para a Lição 1!</div></div>
+    <h3 style="text-align:center; color:#ffd700;">MESTRE AI ELITE 🇦🇴🇺🇸</h3>
+    <div id="chat"><div class="bot"><b>Mestre:</b> Elite System Online. Ready to teach! / Pronto para ensinar!</div></div>
     <div class="controls">
         <input type="text" id="words" placeholder="Escreva aqui..." autocomplete="off">
         <button onclick="p()">SEND</button>
