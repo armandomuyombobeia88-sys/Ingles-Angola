@@ -3,97 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola English AI</title>
+    <title>Angola AI</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; overflow: hidden; }
-        .stats { background: #202c33; padding: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; font-size: 0.8rem; }
-        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 100px; }
-        .m { max-width: 85%; padding: 12px; border-radius: 15px; line-height: 1.4; animation: fadeIn 0.2s; }
-        .bot { background: #202c33; align-self: flex-start; border-top-left-radius: 0; border-left: 3px solid #d81e05; }
-        .user { background: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
-        .input-area { position: fixed; bottom: 0; width: 100%; background: #202c33; padding: 15px; display: flex; gap: 10px; box-sizing: border-box; }
-        input { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 25px; color: white; font-size: 16px; outline: none; }
-        button { background: #f8d800; border: none; width: 50px; height: 50px; border-radius: 50%; color: black; font-weight: bold; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; height: 100vh; display: flex; flex-direction: column; color: white; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 120px; }
+        .m { max-width: 80%; padding: 12px; border-radius: 15px; font-size: 1rem; }
+        .bot { background: #232d36; align-self: flex-start; border-left: 4px solid #d81e05; }
+        .user { background: #005c4b; align-self: flex-end; }
+        
+        .input-area { position: fixed; bottom: 0; width: 100%; background: #111b21; padding: 15px; display: flex; gap: 10px; box-sizing: border-box; border-top: 1px solid #333; }
+        input { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 10px; color: white; font-size: 16px; }
+        .btn { background: #f8d800; color: black; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 1rem; }
     </style>
 </head>
 <body>
 
-<div class="stats">
-    <span>Teacher Mode 🇦🇴</span>
-    <span id="xp-tag">0 XP</span>
-</div>
-
 <div id="chat-box">
-    <div class="m bot"><b>100 Words Active!</b> I'm ready, brother. Test me with 'Ola', 'Family', or 'Fome'. I am waiting for your <b>Verb to Be</b> lesson!</div>
+    <div class="m bot"><b>Ready!</b> Send is fixed. Type 'Ola' or 'Fome' to test. I'm waiting for your <b>Verb to Be</b> lesson!</div>
 </div>
 
 <div class="input-area">
-    <input type="text" id="in" placeholder="Type here..." onkeypress="if(event.key==='Enter') send()">
-    <button onclick="send()">></button>
+    <input type="text" id="in" placeholder="Type here..." autocomplete="off">
+    <button class="btn" onclick="sendMsg()">SEND</button>
 </div>
 
 <script>
-    let xp = 0;
-
-    // THE BRAIN - 100 MOST COMMON WORDS
     const brain = {
         "ola": "Hello!", "bom dia": "Good morning", "boa tarde": "Good afternoon", "boa noite": "Good night",
-        "obrigado": "Thank you", "por favor": "Please", "estamos juntos": "We are together", "mambo": "Thing",
-        "fome": "Hungry", "sede": "Thirsty", "ajuda": "Help", "sim": "Yes", "nao": "No", "quem": "Who",
-        "o que": "What", "onde": "Where", "quando": "When", "porque": "Why", "como": "How",
+        "obrigado": "Thank you", "por favor": "Please", "estamos juntos": "We are together",
+        "fome": "Hungry", "sede": "Thirsty", "ajuda": "Help", "sim": "Yes", "nao": "No",
         "eu": "I", "voce": "You", "ele": "He", "ela": "She", "nos": "We", "eles": "They",
-        "ser": "Be", "ter": "Have", "fazer": "Do", "dizer": "Say", "ir": "Go", "obter": "Get",
-        "ver": "See", "saber": "Know", "pensar": "Think", "vir": "Come", "querer": "Want",
-        "tempo": "Time", "ano": "Year", "dia": "Day", "semana": "Week", "hoje": "Today",
-        "ontem": "Yesterday", "amanha": "Tomorrow", "casa": "Home", "escola": "School",
-        "trabalho": "Work", "cidade": "City", "pais": "Country", "mundo": "World",
-        "familia": "Family", "amigo": "Friend", "mulher": "Woman", "homem": "Man",
-        "crianca": "Child", "vida": "Life", "povo": "People", "coisa": "Thing",
-        "bom": "Good", "mau": "Bad", "feliz": "Happy", "triste", "Sad", "grande": "Big",
-        "pequeno": "Small", "muito": "Very", "mais": "More", "menos": "Less",
-        "agua": "Water", "comida": "Food", "dinheiro": "Money", "carro": "Car",
-        "livro": "Book", "nome": "Name", "lugar": "Place", "parte": "Part",
-        "novo": "New", "velho": "Old", "primeiro": "First", "ultimo": "Last",
-        "aberto": "Open", "fechado": "Closed", "frio": "Cold", "quente": "Hot",
-        "amor": "Love", "paz": "Peace", "de": "Of", "e": "And", "com": "With",
-        "para": "To", "em": "In", "sobre": "On", "mas": "But"
+        "ser": "Be", "ter": "Have", "ir": "Go", "casa": "Home", "escola": "School",
+        "familia": "Family", "amigo": "Friend", "bom": "Good", "mau": "Bad", "agua": "Water"
     };
 
-    function send() {
-        let input = document.getElementById('in');
-        let val = input.value.trim().toLowerCase();
-        if(!val) return;
+    function sendMsg() {
+        const input = document.getElementById('in');
+        const text = input.value.trim().toLowerCase();
+        if (!text) return;
 
-        addMsg(input.value, 'user');
+        // Show user message
+        addBubble(input.value, 'user');
         input.value = "";
-
+        
+        // Bot Response
         setTimeout(() => {
-            let response = brain[val];
-
-            if(response) {
-                addMsg("🇺🇸 <b>" + response + "</b>", 'bot');
-                speak(response);
-                xp += 10;
-                document.getElementById('xp-tag').innerText = xp + " XP";
+            const reply = brain[text];
+            if (reply) {
+                addBubble("🇺🇸 <b>" + reply + "</b>", 'bot');
+                const s = new SpeechSynthesisUtterance(reply);
+                window.speechSynthesis.speak(s);
             } else {
-                addMsg("I'm learning this! Send the Verb to Be lesson so I can get smarter.", 'bot');
+                addBubble("I'm ready! Paste the <b>Verb to Be</b> lesson here, brother.", 'bot');
             }
         }, 400);
     }
 
-    function addMsg(t, s) {
-        let d = document.createElement('div');
-        d.className = 'm ' + s; d.innerHTML = t;
-        let box = document.getElementById('chat-box');
-        box.appendChild(d); box.scrollTop = box.scrollHeight;
-    }
-
-    function speak(t) {
-        let s = new SpeechSynthesisUtterance(t);
-        s.lang = 'en-US';
-        window.speechSynthesis.speak(s);
+    function addBubble(txt, side) {
+        const div = document.createElement('div');
+        div.className = 'm ' + side;
+        div.innerHTML = txt;
+        const box = document.getElementById('chat-box');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
     }
 </script>
+
 </body>
 </html>
