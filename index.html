@@ -1,73 +1,101 @@
-<script>
-    // Two-Way Dictionary
-    var dicionario = {
-        "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
-        "a": "um", "in": "em", "that": "que", "have": "ter", "i": "eu",
-        "it": "isto", "for": "por", "not": "não", "on": "sobre", "with": "com",
-        "he": "ele", "as": "como", "you": "você", "do": "fazer", "at": "em",
-        "this": "este", "but": "mas", "his": "dele", "by": "por", "from": "de",
-        "they": "eles", "we": "nós", "say": "dizer", "her": "dela", "she": "ela",
-        "or": "ou", "an": "um", "will": "será", "my": "meu", "one": "um",
-        "all": "tudo", "would": "seria", "there": "lá", "their": "deles", "what": "o que",
-        "so": "então", "up": "cima", "out": "fora", "if": "se", "about": "sobre",
-        "who": "quem", "get": "pegar", "which": "qual", "go": "ir", "me": "mim",
-        "work": "trabalhar", "speak": "falar", "learn": "aprender", "write": "escrever"
-    };
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Angola Teacher</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
+        #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; }
+        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; border-left: 3px solid #ffd700; padding-left: 10px; }
+        .user { color: #ffffff; margin-bottom: 15px; text-align: right; font-weight: bold; }
+        .input-box { display: flex; gap: 5px; padding-bottom: 10px; }
+        input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; }
+        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; min-width: 80px; }
+    </style>
+</head>
+<body>
 
-    function falarTudo() {
-        var campo = document.getElementById("words");
-        var tela = document.getElementById("chat");
-        var input = campo.value.trim().toLowerCase();
+    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Professor Americano 🇦🇴🇺🇸</h3>
+    
+    <div id="chat">
+        <div class="bot">Teacher: Hello! Type a word in English or Portuguese! / Olá! Escreve uma palavra em Inglês ou Português!</div>
+    </div>
 
-        if (input === "") return;
+    <div class="input-box">
+        <input type="text" id="words" placeholder="Escreva aqui...">
+        <button onclick="falarTudo()">SEND</button>
+    </div>
 
-        tela.innerHTML += "<div class='user'>Tu: " + input + "</div>";
+    <script>
+        // THE FULL 50 WORDS (EN and PT)
+        var dicionario = {
+            "the": "o", "be": "ser", "to": "para", "of": "de", "and": "e",
+            "a": "um", "in": "em", "that": "que", "have": "ter", "i": "eu",
+            "it": "isto", "for": "por", "not": "nao", "on": "sobre", "with": "com",
+            "he": "ele", "as": "como", "you": "voce", "do": "fazer", "at": "em",
+            "this": "este", "but": "mas", "his": "dele", "by": "por", "from": "de",
+            "they": "eles", "we": "nos", "say": "dizer", "her": "dela", "she": "ela",
+            "or": "ou", "an": "um", "will": "sera", "my": "meu", "one": "um",
+            "all": "tudo", "would": "seria", "there": "la", "their": "deles", "what": "o que",
+            "so": "entao", "up": "cima", "out": "fora", "if": "se", "about": "sobre",
+            "who": "quem", "get": "pegar", "which": "qual", "go": "ir", "me": "mim",
+            "work": "trabalhar", "speak": "falar", "learn": "aprender", "write": "escrever"
+        };
 
-        var respostaEN = "";
-        var respostaPT = "";
-        var encontrouTradução = false;
+        function falarTudo() {
+            var campo = document.getElementById("words");
+            var tela = document.getElementById("chat");
+            var input = campo.value.trim().toLowerCase();
 
-        // 1. Check if input is ENGLISH (Find Portuguese)
-        if (dicionario[input]) {
-            respostaEN = "The translation is:";
-            respostaPT = input.toUpperCase() + " em Português é: " + dicionario[input];
-            encontrouTradução = true;
-        } 
-        
-        // 2. Check if input is PORTUGUESE (Find English)
-        else {
-            for (var eng in dicionario) {
-                if (dicionario[eng] === input) {
-                    respostaEN = "In English we say: " + eng.toUpperCase();
-                    respostaPT = "Muito bem! " + input.toUpperCase() + " em Inglês é " + eng.toUpperCase();
-                    encontrouTradução = true;
-                    break;
+            if (input === "") return;
+
+            tela.innerHTML += "<div class='user'>Tu: " + input + "</div>";
+
+            var respostaEN = "";
+            var respostaPT = "";
+            var encontrou = false;
+
+            // 1. Check if English
+            if (dicionario[input]) {
+                respostaEN = "The translation is " + dicionario[input];
+                respostaPT = "A tradução de " + input.toUpperCase() + " é " + dicionario[input];
+                encontrou = true;
+            } 
+            
+            // 2. Check if Portuguese
+            if (!encontrou) {
+                for (var key in dicionario) {
+                    if (dicionario[key] === input) {
+                        respostaEN = "In English we say " + key.toUpperCase();
+                        respostaPT = "Muito bem! Em Inglês dizemos " + key.toUpperCase();
+                        encontrou = true;
+                        break;
+                    }
                 }
             }
+
+            if (!encontrou) {
+                respostaEN = "I am still learning.";
+                respostaPT = "Ainda estou a aprender essa palavra.";
+            }
+
+            tela.innerHTML += "<div class='bot'><b>Teacher:</b> " + respostaEN + "<br>" + respostaPT + "</div>";
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                var m1 = new SpeechSynthesisUtterance(respostaEN);
+                m1.lang = 'en-US'; m1.rate = 0.8;
+                window.speechSynthesis.speak(m1);
+
+                var m2 = new SpeechSynthesisUtterance(respostaPT);
+                m2.lang = 'pt-PT'; m2.rate = 1.0;
+                window.speechSynthesis.speak(m2);
+            }
+
+            campo.value = "";
+            tela.scrollTop = tela.scrollHeight;
         }
-
-        // 3. If word not found
-        if (!encontrouTradução) {
-            respostaEN = "I am still learning that word.";
-            respostaPT = "Ainda estou a aprender essa palavra. Tenta outra!";
-        }
-
-        // Display
-        tela.innerHTML += "<div class='bot'><b>Teacher:</b> " + respostaEN + "<br><small>" + respostaPT + "</small></div>";
-
-        // Voice
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            var m1 = new SpeechSynthesisUtterance(respostaEN);
-            m1.lang = 'en-US'; m1.rate = 0.8;
-            window.speechSynthesis.speak(m1);
-
-            var m2 = new SpeechSynthesisUtterance(respostaPT);
-            m2.lang = 'pt-PT'; m2.rate = 1.0;
-            window.speechSynthesis.speak(m2);
-        }
-
-        campo.value = "";
-        tela.scrollTop = tela.scrollHeight;
-    }
-</script>
+    </script>
+</body>
+</html>
