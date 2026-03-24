@@ -3,58 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola AI</title>
+    <title>Angola AI Teacher</title>
     <style>
         body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; height: 100vh; display: flex; flex-direction: column; color: white; }
-        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 120px; }
-        .m { max-width: 80%; padding: 12px; border-radius: 15px; font-size: 1rem; }
-        .bot { background: #232d36; align-self: flex-start; border-left: 4px solid #d81e05; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 120px; }
+        .m { max-width: 90%; padding: 14px; border-radius: 15px; font-size: 0.95rem; line-height: 1.5; }
+        .bot { background: #232d36; align-self: flex-start; border-left: 4px solid #d81e05; shadow: 2px 2px 5px rgba(0,0,0,0.3); }
         .user { background: #005c4b; align-self: flex-end; }
-        
         .input-area { position: fixed; bottom: 0; width: 100%; background: #111b21; padding: 15px; display: flex; gap: 10px; box-sizing: border-box; border-top: 1px solid #333; }
-        input { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 10px; color: white; font-size: 16px; }
-        .btn { background: #f8d800; color: black; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 1rem; }
+        input { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 10px; color: white; font-size: 16px; outline: none; }
+        .btn { background: #f8d800; color: black; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
+        b { color: #f8d800; }
+        i { color: #00a884; }
     </style>
 </head>
 <body>
 
 <div id="chat-box">
-    <div class="m bot"><b>Ready!</b> Send is fixed. Type 'Ola' or 'Fome' to test. I'm waiting for your <b>Verb to Be</b> lesson!</div>
+    <div class="m bot"><b>Mambo, brother!</b> I am updated with your <b>Verb to Be</b> lesson. <br><br>Type <b>"Aula"</b> to start the class, or type any word to translate!</div>
 </div>
 
 <div class="input-area">
-    <input type="text" id="in" placeholder="Type here..." autocomplete="off">
+    <input type="text" id="in" placeholder="Type 'Aula' or a word..." autocomplete="off">
     <button class="btn" onclick="sendMsg()">SEND</button>
 </div>
 
 <script>
     const brain = {
-        "ola": "Hello!", "bom dia": "Good morning", "boa tarde": "Good afternoon", "boa noite": "Good night",
-        "obrigado": "Thank you", "por favor": "Please", "estamos juntos": "We are together",
-        "fome": "Hungry", "sede": "Thirsty", "ajuda": "Help", "sim": "Yes", "nao": "No",
-        "eu": "I", "voce": "You", "ele": "He", "ela": "She", "nos": "We", "eles": "They",
-        "ser": "Be", "ter": "Have", "ir": "Go", "casa": "Home", "escola": "School",
-        "familia": "Family", "amigo": "Friend", "bom": "Good", "mau": "Bad", "agua": "Water"
+        "ola": "Hello!", "fome": "Hungry", "estamos juntos": "We are together", "obrigado": "Thank you",
+        "casa": "Home", "escola": "School", "trabalho": "Work", "familia": "Family"
     };
+
+    const verbToBeLesson = `
+    👨‍🏫 <b>VERB TO BE (Ser/Estar)</b><br><br>
+    <b>1. PRESENT (Presente)</b><br>
+    • I <b>am</b> (Eu sou/estou)<br>
+    • You <b>are</b> (Tu és/estás)<br>
+    • He/She/It <b>is</b> (Ele/Ela é/está)<br>
+    • We <b>are</b> (Nós somos/estamos)<br>
+    • They <b>are</b> (Eles são/estão)<br><br>
+    
+    <b>2. PAST (Passado)</b><br>
+    • I/He/She/It <b>was</b> (Eu era/estava)<br>
+    • You/We/They <b>were</b> (Tu eras/estavas)<br><br>
+    
+    <b>3. FUTURE (Futuro)</b><br>
+    • I <b>will be</b> (Eu serei/estarei)<br>
+    • You <b>will be</b> (Tu serás/estarás)<br><br>
+    
+    <i>Exemplo: I am a teacher. (Eu sou professor).</i><br>
+    <i>Exemplo: I was tired. (Eu estava cansado).</i><br>
+    <i>Exemplo: I will be happy. (Eu serei feliz).</i>
+    `;
 
     function sendMsg() {
         const input = document.getElementById('in');
         const text = input.value.trim().toLowerCase();
         if (!text) return;
 
-        // Show user message
         addBubble(input.value, 'user');
         input.value = "";
         
-        // Bot Response
         setTimeout(() => {
-            const reply = brain[text];
-            if (reply) {
+            if (text === "aula" || text === "lesson" || text.includes("verb")) {
+                addBubble(verbToBeLesson, 'bot');
+                speak("I am, You are, He is. The verb to be is the most important verb in English.");
+            } else if (brain[text]) {
+                const reply = brain[text];
                 addBubble("🇺🇸 <b>" + reply + "</b>", 'bot');
-                const s = new SpeechSynthesisUtterance(reply);
-                window.speechSynthesis.speak(s);
+                speak(reply);
             } else {
-                addBubble("I'm ready! Paste the <b>Verb to Be</b> lesson here, brother.", 'bot');
+                addBubble("I don't know that yet! But type <b>'Aula'</b> to learn the Verb to Be.", 'bot');
             }
         }, 400);
     }
@@ -67,7 +86,13 @@
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
     }
-</script>
 
+    function speak(t) {
+        const s = new SpeechSynthesisUtterance(t);
+        s.lang = 'en-US';
+        s.rate = 0.8;
+        window.speechSynthesis.speak(s);
+    }
+</script>
 </body>
 </html>
