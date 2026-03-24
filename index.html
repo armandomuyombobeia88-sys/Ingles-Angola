@@ -9,11 +9,8 @@
         #chat { flex-grow: 1; border: 1px solid #333; border-radius: 15px; padding: 15px; overflow-y: auto; background: #111; margin-bottom: 10px; }
         .bot { color: #00ffcc; margin-bottom: 15px; border-left: 4px solid #ffd700; padding-left: 10px; }
         .user { color: #ffd700; margin-bottom: 15px; text-align: right; font-weight: bold; }
-        
-        /* MENU BUTTONS */
         .menu { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px; }
         .m-btn { background: #333; color: #ffd700; border: 1px solid #ffd700; padding: 8px 15px; border-radius: 20px; font-size: 12px; white-space: nowrap; }
-        
         .controls { display: flex; gap: 5px; padding-bottom: 10px; }
         input { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: white; -webkit-appearance: none; }
         button#send { padding: 15px 20px; background: #ffd700; border: none; border-radius: 12px; font-weight: bold; color: black; }
@@ -23,26 +20,32 @@
     <h3 style="text-align:center; color:#ffd700; margin: 5px;">MESTRE AI ELITE 🇦🇴🇺🇸</h3>
     
     <div id="chat">
-        <div class="bot"><b>Mestre:</b> Elite System Online. Use the menu or type a word!</div>
+        <div class="bot"><b>Mestre:</b> Dictionary Beefed Up! 🥩 I now know Questions, Weather, and Adjectives.</div>
     </div>
 
     <div class="menu">
-        <div class="m-btn" onclick="sendL('Cores')">🎨 CORES</div>
-        <div class="m-btn" onclick="sendL('Comida')">🍎 COMIDA</div>
-        <div class="m-btn" onclick="sendL('Lugares')">🏠 LUGARES</div>
+        <div class="m-btn" onclick="sendL('Questions')">❓ PERGUNTAS</div>
+        <div class="m-btn" onclick="sendL('Weather')">☁️ TEMPO</div>
+        <div class="m-btn" onclick="sendL('Adjectives')">✨ DESCREVER</div>
     </div>
 
     <div class="controls">
-        <input type="text" id="words" placeholder="Escreva aqui..." autocomplete="off">
+        <input type="text" id="words" placeholder="Escreva..." autocomplete="off">
         <button id="send" onclick="p()">SEND</button>
     </div>
 
     <script>
         var lib = {
-            "red":"Vermelho","blue":"Azul","green":"Verde","yellow":"Amarelo","black":"Preto","white":"Branco",
-            "bread":"Pao","water":"Agua","rice":"Arroz","meat":"Carne","chicken":"Frango","fish":"Peixe",
-            "house":"Casa","school":"Escola","hospital":"Hospital","market":"Mercado","bank":"Banco",
-            "hello":"Ola","ok":"Esta bem","yes":"Sim","no":"Nao","work":"Trabalhar","speak":"Falar"
+            // QUESTIONS (As "5 Ws")
+            "who": "Quem", "what": "O que", "where": "Onde", "when": "Quando", "why": "Porque", "how": "Como", "because": "Porque (resposta)",
+            // WEATHER (Tempo)
+            "sun": "Sol", "rain": "Chuva", "wind": "Vento", "cloud": "Nuvem", "hot": "Quente", "cold": "Frio", "storm": "Tempestade", "weather": "Tempo",
+            // QUANTITATIVE (Quantitativos)
+            "many": "Muitos", "much": "Muito", "few": "Poucos", "some": "Alguns", "all": "Tudo", "half": "Metade", "empty": "Vazio", "full": "Cheio",
+            // ADJECTIVES (Descritivos)
+            "big": "Grande", "small": "Pequeno", "fast": "Rápido", "slow": "Lento", "good": "Bom", "bad": "Mau", "happy": "Feliz", "sad": "Triste", "strong": "Forte", "weak": "Fraco", "easy": "Fácil", "hard": "Difícil", "beautiful": "Bonito", "ugly": "Feio", "new": "Novo", "old": "Velho", "rich": "Rico", "poor": "Pobre",
+            // BASICS
+            "hello": "Ola", "ok": "Esta bem", "yes": "Sim", "no": "Nao", "work": "Trabalhar", "speak": "Falar"
         };
 
         function f(t){window.speechSynthesis.cancel();var m=new SpeechSynthesisUtterance(t);m.lang='en-US';m.rate=0.8;window.speechSynthesis.speak(m);}
@@ -55,17 +58,19 @@
         function p(){
             var c=document.getElementById("words"), t=document.getElementById("chat"), i=c.value.trim().toLowerCase();
             if(!i)return; t.innerHTML+="<div class='user'>"+i+"</div>";
+            var en="I heard "+i; var pt="Ouvi "+i;
             
-            var en="I am learning "+i; var pt="Estou a aprender "+i;
+            // SPECIAL CATEGORY RESPONSES
+            if(i === "questions"){ en="Question Words: Who, What, Where, When, Why, How."; pt="Palavras de Pergunta: Quem, O que, Onde, Quando, Porque, Como."; }
+            else if(i === "weather"){ en="Weather: Sun, Rain, Wind, Hot, Cold."; pt="Tempo: Sol, Chuva, Vento, Quente, Frio."; }
+            else if(i === "adjectives"){ en="Adjectives: Big, Small, Fast, Slow, Strong, Weak."; pt="Adjetivos: Grande, Pequeno, Rápido, Lento, Forte, Fraco."; }
             
-            if(i.includes("cores")){ en="Colors: Red, Blue, Green, Yellow."; pt="Cores: Vermelho, Azul, Verde, Amarelo."; }
-            else if(i.includes("comida")){ en="Food: Bread, Water, Rice, Meat."; pt="Comida: Pão, Água, Arroz, Carne."; }
-            else if(i.includes("lugares")){ en="Places: House, School, Hospital, Market."; pt="Lugares: Casa, Escola, Hospital, Mercado."; }
+            // DICTIONARY SEARCH
             else if(lib[i]){ en="Translation: "+lib[i]; pt=i.toUpperCase()+" é "+lib[i]; }
             else {
                 var achou = false;
                 for(var k in lib){ if(lib[k].toLowerCase()===i){ en="In English: "+k.toUpperCase(); pt="Em Inglês: "+k.toUpperCase(); achou=true; break; } }
-                if(!achou) { en="I heard "+i; pt="Eu ouvi "+i; }
+                if(!achou) { en="I am learning "+i; pt="Estou a aprender "+i; }
             }
 
             t.innerHTML+="<div class='bot'><b>Mestre:</b> "+en+"<br><small>"+pt+"</small></div>";
