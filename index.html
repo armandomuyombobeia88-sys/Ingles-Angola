@@ -1,104 +1,160 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI Uber</title>
+    <title>Mestre AI Uber - Evolution</title>
     <style>
-        body { background: #050505; color: #eee; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        #chat { flex-grow: 1; border: 1px solid #444; border-radius: 15px; padding: 15px; overflow-y: auto; background: #0f0f0f; margin-bottom: 10px; box-shadow: inset 0 0 20px #000; }
-        .bot { color: #00ffcc; margin-bottom: 15px; border-left: 4px solid #ffd700; padding-left: 10px; animation: slideIn 0.3s; }
-        .user { color: #ffd700; margin-bottom: 15px; text-align: right; font-weight: bold; }
+        :root { --gold: #ffd700; --dark: #050505; --card: #1a1a1a; --accent: #00ffcc; }
+        body { background: var(--dark); color: #eee; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
         
-        /* UBER BUILDER BOX */
-        .builder { background: #1a1a1a; padding: 10px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #ffd700; }
-        .row { display: flex; gap: 5px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
-        .row::-webkit-scrollbar { display: none; }
-        .chip { background: #333; color: white; padding: 8px 15px; border-radius: 8px; font-size: 13px; white-space: nowrap; border: 1px solid #555; }
-        .chip:active { background: #ffd700; color: black; }
+        /* HOME SCREEN */
+        #home-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; transition: 0.5s;
+        }
+        .logo-glow {
+            font-size: 3rem; font-weight: 900; color: var(--gold);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4); margin-bottom: 10px;
+        }
+        .menu-card {
+            width: 80%; max-width: 300px; background: rgba(255,255,255,0.05);
+            padding: 20px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.2);
+            backdrop-filter: blur(10px); text-align: center;
+        }
+        .level-btn {
+            display: block; width: 100%; padding: 15px; margin: 10px 0;
+            border-radius: 12px; border: none; font-weight: bold; cursor: pointer;
+            transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .beginner { background: var(--accent); color: #000; }
+        .intermediate { background: var(--gold); color: #000; }
+        .advanced { background: #ff4444; color: #fff; }
+
+        /* APP INTERFACE (HIDDEN BY DEFAULT) */
+        #app-interface { display: none; flex-direction: column; height: 100vh; padding: 10px; box-sizing: border-box; }
         
-        .controls { display: flex; gap: 5px; padding-bottom: 10px; }
-        input { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: white; -webkit-appearance: none; }
-        button#send { padding: 15px 20px; background: #ffd700; border: none; border-radius: 12px; font-weight: bold; color: black; }
-        @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        #chat { flex-grow: 1; border: 1px solid #333; border-radius: 20px; padding: 15px; overflow-y: auto; background: #0c0c0c; margin-bottom: 10px; }
+        .bot { color: var(--accent); margin-bottom: 15px; border-left: 4px solid var(--gold); padding-left: 10px; font-size: 0.9rem; }
+        .user { color: var(--gold); margin-bottom: 15px; text-align: right; font-weight: bold; }
+        
+        .builder { background: var(--card); padding: 12px; border-radius: 15px; border: 1px solid #333; margin-bottom: 10px; }
+        .row-label { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+        .chip { background: #2a2a2a; padding: 10px 18px; border-radius: 10px; font-size: 14px; white-space: nowrap; border: 1px solid #444; transition: 0.2s; }
+        .chip:active { transform: scale(0.9); background: var(--gold); color: #000; }
+        
+        .controls { display: flex; gap: 8px; }
+        input { flex: 1; padding: 15px; border-radius: 15px; border: 1px solid #333; background: #111; color: white; outline: none; }
+        .btn-action { padding: 15px; border-radius: 15px; border: none; font-weight: bold; }
+        #send { background: var(--gold); color: black; flex: 2; }
+        #back { background: #333; color: white; flex: 1; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
-    <h3 style="text-align:center; color:#ffd700; margin: 5px; letter-spacing: 2px;">UBER MESTRE AI 🇦🇴</h3>
-    
-    <div id="chat">
-        <div class="bot"><b>Mestre:</b> Uber System Engaged. Tap the blocks to build a sentence! / Toca nos blocos para formar uma frase!</div>
-    </div>
 
-    <div class="builder">
-        <div class="row" id="who">
-            <div class="chip" onclick="add('I ')">I (Eu)</div>
-            <div class="chip" onclick="add('You ')">You (Tu)</div>
-            <div class="chip" onclick="add('He ')">He (Ele)</div>
-            <div class="chip" onclick="add('She ')">She (Ela)</div>
-            <div class="chip" onclick="add('We ')">We (Nós)</div>
-        </div>
-        <div class="row" id="action">
-            <div class="chip" onclick="add('am ')">am/are/is (sou/estou)</div>
-            <div class="chip" onclick="add('want ')">want (quero)</div>
-            <div class="chip" onclick="add('have ')">have (tenho)</div>
-            <div class="chip" onclick="add('need ')">need (preciso)</div>
-            <div class="chip" onclick="add('go to ')">go to (vou para)</div>
-        </div>
-        <div class="row" id="desc">
-            <div class="chip" onclick="add('happy')">happy (feliz)</div>
-            <div class="chip" onclick="add('hungry')">hungry (fome)</div>
-            <div class="chip" onclick="add('water')">water (água)</div>
-            <div class="chip" onclick="add('work')">work (trabalho)</div>
-            <div class="chip" onclick="add('school')">school (escola)</div>
-            <div class="chip" onclick="add('now')">now (agora)</div>
+    <div id="home-screen">
+        <div class="logo-glow">MESTRE AI</div>
+        <p style="color: #888; margin-bottom: 30px;">Select your journey / Escolha o seu nível</p>
+        <div class="menu-card">
+            <button class="level-btn beginner" onclick="startApp('beginner')">Beginner (Iniciante)</button>
+            <button class="level-btn intermediate" onclick="startApp('intermediate')">Intermediate</button>
+            <button class="level-btn advanced" onclick="startApp('advanced')">Advanced (Pro)</button>
         </div>
     </div>
 
-    <div class="controls">
-        <input type="text" id="words" placeholder="Sentence builds here..." autocomplete="off">
-        <button id="send" onclick="p()">SEND</button>
+    <div id="app-interface">
+        <div id="chat">
+            <div class="bot"><b>Mestre:</b> Ready to build. Pick your level chips!</div>
+        </div>
+
+        <div class="builder" id="chip-container">
+            </div>
+
+        <div class="controls">
+            <button id="back" class="btn-action" onclick="goHome()">🏠</button>
+            <input type="text" id="words" placeholder="Build your sentence..." readonly>
+            <button id="send" class="btn-action" onclick="processSentence()">SEND</button>
+        </div>
     </div>
 
     <script>
-        var lib = {
-            "i am happy": "Eu estou feliz",
-            "i want water": "Eu quero água",
-            "you are happy": "Tu estás feliz",
-            "i go to school": "Eu vou para a escola",
-            "i need work": "Eu preciso de trabalho",
-            "he is hungry": "Ele tem fome"
+        const content = {
+            beginner: {
+                who: ["I", "You", "He", "She"],
+                action: ["am", "want", "need", "go to"],
+                desc: ["happy", "water", "work", "school"]
+            },
+            intermediate: {
+                who: ["My friend", "The driver", "We"],
+                action: ["are looking for", "can find", "will pay"],
+                desc: ["the address", "a discount", "cash", "now"]
+            },
+            advanced: {
+                who: ["Notwithstanding", "The passenger"],
+                action: ["has requested", "is arriving"],
+                desc: ["immediately", "due to traffic", "per agreement"]
+            }
         };
 
-        function f(t){window.speechSynthesis.cancel(); var m=new SpeechSynthesisUtterance(t); m.lang='en-US'; m.rate=0.8; window.speechSynthesis.speak(m);}
-        
-        function add(word) {
+        function startApp(level) {
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('app-interface').style.display = 'flex';
+            loadChips(level);
+        }
+
+        function goHome() {
+            document.getElementById('home-screen').style.display = 'flex';
+            document.getElementById('app-interface').style.display = 'none';
+            document.getElementById('words').value = "";
+        }
+
+        function loadChips(level) {
+            const container = document.getElementById('chip-container');
+            container.innerHTML = ""; // Clear
+            
+            for (let category in content[level]) {
+                let rowHtml = `<div class="row-label">${category}</div><div class="row">`;
+                content[level][category].forEach(word => {
+                    rowHtml += `<div class="chip" onclick="addWord('${word} ')">${word}</div>`;
+                });
+                rowHtml += `</div>`;
+                container.innerHTML += rowHtml;
+            }
+        }
+
+        function addWord(word) {
             document.getElementById("words").value += word;
         }
 
-        function p(){
-            var c=document.getElementById("words"), t=document.getElementById("chat"), i=c.value.trim().toLowerCase();
-            if(!i)return; 
-            t.innerHTML+="<div class='user'>"+i+"</div>";
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            let msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            msg.rate = 0.85;
+            window.speechSynthesis.speak(msg);
+        }
+
+        function processSentence() {
+            let val = document.getElementById("words").value.trim();
+            if(!val) return;
             
-            var resPT = "Frase construída!";
-            var found = false;
+            let chat = document.getElementById("chat");
+            chat.innerHTML += `<div class="user">${val}</div>`;
+            
+            // Artificial intelligence response simulation
+            setTimeout(() => {
+                chat.innerHTML += `<div class="bot"><b>Mestre:</b> ${val.toUpperCase()}<br><small>Translating and analyzing syntax...</small></div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 500);
 
-            // Simple Logic for the Builder
-            for(var key in lib){
-                if(i.includes(key)){
-                    resPT = lib[key];
-                    found = true;
-                    break;
-                }
-            }
-
-            if(!found) resPT = "Analyzing sentence...";
-
-            t.innerHTML+="<div class='bot'><b>Mestre:</b> " + i.toUpperCase() + "<br><small>" + resPT + "</small></div>";
-            f(i);
-            c.value="";
-            t.scrollTop=t.scrollHeight;
+            speak(val);
+            document.getElementById("words").value = "";
+            chat.scrollTop = chat.scrollHeight;
         }
     </script>
 </body>
