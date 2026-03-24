@@ -3,95 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola Teacher</title>
+    <title>Angola Teacher AI</title>
     <style>
         body { background: #121212; color: white; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
         #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; }
         .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; border-left: 3px solid #ffd700; padding-left: 10px; }
         .user { color: #ffffff; margin-bottom: 15px; text-align: right; font-weight: bold; }
-        .input-box { display: flex; gap: 5px; padding-bottom: 10px; }
+        .controls { display: flex; gap: 5px; padding-bottom: 10px; align-items: center; }
         input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; }
-        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; min-width: 80px; }
+        .btn { padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #sendBtn { background: #ffd700; color: black; }
+        #micBtn { background: #ff4444; color: white; font-size: 20px; }
     </style>
 </head>
 <body>
 
-    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Professor Americano 🇦🇴🇺🇸</h3>
+    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Mestre de Voz 🇦🇴🇺🇸</h3>
     
     <div id="chat">
-        <div class="bot">Teacher: Hello! Type a word in English or Portuguese! / Olá! Escreve uma palavra em Inglês ou Português!</div>
+        <div class="bot">Teacher: Tap the 🎤 to speak to me! / Toca no 🎤 para falares comigo!</div>
     </div>
 
-    <div class="input-box">
-        <input type="text" id="words" placeholder="Escreva aqui...">
-        <button onclick="falarTudo()">SEND</button>
+    <div class="controls">
+        <input type="text" id="words" placeholder="Escreva ou fale...">
+        <button id="micBtn" onclick="ouvir()">🎤</button>
+        <button id="sendBtn" onclick="falarTudo()">SEND</button>
     </div>
 
     <script>
-        // THE FULL 50 WORDS (EN and PT)
         var dicionario = {
             "the": "o", "be": "ser", "to": "para", "of": "de", "and": "e",
-            "a": "um", "in": "em", "that": "que", "have": "ter", "i": "eu",
-            "it": "isto", "for": "por", "not": "nao", "on": "sobre", "with": "com",
-            "he": "ele", "as": "como", "you": "voce", "do": "fazer", "at": "em",
-            "this": "este", "but": "mas", "his": "dele", "by": "por", "from": "de",
-            "they": "eles", "we": "nos", "say": "dizer", "her": "dela", "she": "ela",
-            "or": "ou", "an": "um", "will": "sera", "my": "meu", "one": "um",
-            "all": "tudo", "would": "seria", "there": "la", "their": "deles", "what": "o que",
-            "so": "entao", "up": "cima", "out": "fora", "if": "se", "about": "sobre",
-            "who": "quem", "get": "pegar", "which": "qual", "go": "ir", "me": "mim",
-            "work": "trabalhar", "speak": "falar", "learn": "aprender", "write": "escrever"
+            "have": "ter", "i": "eu", "you": "voce", "work": "trabalhar", "speak": "falar"
+            // Add more words here later
         };
 
+        // --- THE "EARS" (SPEECH TO TEXT) ---
+        var recognition;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            recognition.onresult = function(event) {
+                var voiceText = event.results[0][0].transcript;
+                document.getElementById("words").value = voiceText;
+                falarTudo(); // Automatically process what it heard
+            };
+            
+            recognition.onerror = function(e) { console.log("Erro: " + e.error); };
+        }
+
+        function ouvir() {
+            if (recognition) {
+                recognition.lang = 'en-US'; // It listens for English first
+                recognition.start();
+                document.getElementById("micBtn").style.background = "#00ff00"; // Turns green when listening
+                setTimeout(function(){ document.getElementById("micBtn").style.background = "#ff4444"; }, 3000);
+            } else {
+                alert("Voice not supported on this browser.");
+            }
+        }
+
+        // --- THE "BRAIN" (TRANSLATION) ---
         function falarTudo() {
             var campo = document.getElementById("words");
             var tela = document.getElementById("chat");
             var input = campo.value.trim().toLowerCase();
-
             if (input === "") return;
 
             tela.innerHTML += "<div class='user'>Tu: " + input + "</div>";
 
-            var respostaEN = "";
-            var respostaPT = "";
-            var encontrou = false;
+            var resEN = ""; var resPT = ""; var encontrou = false;
 
-            // 1. Check if English
             if (dicionario[input]) {
-                respostaEN = "The translation is " + dicionario[input];
-                respostaPT = "A tradução de " + input.toUpperCase() + " é " + dicionario[input];
+                resEN = "The translation is " + dicionario[input];
+                resPT = "A tradução é " + dicionario[input];
                 encontrou = true;
-            } 
-            
-            // 2. Check if Portuguese
-            if (!encontrou) {
+            } else {
                 for (var key in dicionario) {
                     if (dicionario[key] === input) {
-                        respostaEN = "In English we say " + key.toUpperCase();
-                        respostaPT = "Muito bem! Em Inglês dizemos " + key.toUpperCase();
-                        encontrou = true;
-                        break;
+                        resEN = "In English we say " + key.toUpperCase();
+                        resPT = "Em Inglês dizemos " + key.toUpperCase();
+                        encontrou = true; break;
                     }
                 }
             }
 
-            if (!encontrou) {
-                respostaEN = "I am still learning.";
-                respostaPT = "Ainda estou a aprender essa palavra.";
-            }
+            if (!encontrou) { resEN = "I heard " + input; resPT = "Eu ouvi " + input; }
 
-            tela.innerHTML += "<div class='bot'><b>Teacher:</b> " + respostaEN + "<br>" + respostaPT + "</div>";
+            tela.innerHTML += "<div class='bot'><b>Teacher:</b> " + resEN + "<br>" + resPT + "</div>";
 
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                var m1 = new SpeechSynthesisUtterance(respostaEN);
-                m1.lang = 'en-US'; m1.rate = 0.8;
-                window.speechSynthesis.speak(m1);
-
-                var m2 = new SpeechSynthesisUtterance(respostaPT);
-                m2.lang = 'pt-PT'; m2.rate = 1.0;
-                window.speechSynthesis.speak(m2);
-            }
+            window.speechSynthesis.cancel();
+            var m1 = new SpeechSynthesisUtterance(resEN); m1.lang = 'en-US'; window.speechSynthesis.speak(m1);
+            var m2 = new SpeechSynthesisUtterance(resPT); m2.lang = 'pt-PT'; window.speechSynthesis.speak(m2);
 
             campo.value = "";
             tela.scrollTop = tela.scrollHeight;
