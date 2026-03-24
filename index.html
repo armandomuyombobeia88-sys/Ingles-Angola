@@ -3,32 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - World Conquest</title>
+    <title>Mestre AI - The Boss Overlord</title>
     <style>
-        :root { --gold: #ffd700; --dark: #050505; --surface: #121212; --accent: #00ffcc; --legendary: #ff00ff; }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+        :root { 
+            --gold: #ffd700; --dark: #050505; --surface: #121212; 
+            --accent: #00ffcc; --legendary: #ff00ff; --danger: #ff4444;
+        }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.4s; }
         body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* WORLD SELECTOR */
-        #world-map { position: fixed; inset: 0; z-index: 5000; background: #000; display: flex; flex-direction: column; padding: 30px; align-items: center; justify-content: center; }
-        .country-card { width: 100%; max-width: 350px; background: #111; border: 1px solid #333; border-radius: 25px; padding: 25px; margin-bottom: 20px; text-align: center; cursor: pointer; }
-        .country-card.active { border-color: var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
-        .country-card.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
+        /* THE OPEN EXPLORER MAP */
+        #map-screen {
+            position: fixed; inset: 0; z-index: 4000; background: #000;
+            display: flex; flex-direction: column; padding: 20px; overflow-y: auto;
+        }
+        .district-card {
+            background: rgba(255,255,255,0.03); border: 1px solid #333;
+            border-radius: 20px; padding: 20px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .district-card.locked { border-style: dashed; border-color: #444; }
+        .district-card.locked .lock-icon { font-size: 20px; color: var(--danger); }
+        .unlock-btn { background: var(--danger); border: none; color: white; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        /* BOSS CHEST ANIMATION */
-        #chest-zone { margin: 20px 0; padding: 20px; background: rgba(255,215,0,0.1); border-radius: 20px; border: 1px dashed var(--gold); cursor: pointer; }
-        #chest-zone:active { transform: scale(0.95); }
+        /* REAL ESTATE TICKER */
+        #property-bar { background: #111; padding: 10px; font-size: 10px; color: var(--accent); border-bottom: 1px solid #222; display: flex; gap: 15px; }
 
-        /* MAP UI */
-        #map-screen { position: fixed; inset: 0; z-index: 4000; background: #000; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
-        .district-card { background: #1a1a1a; border-radius: 20px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
-        .stars { color: var(--gold); font-size: 14px; }
+        /* BOSS CHALLENGE OVERLAY */
+        #boss-overlay {
+            position: fixed; inset: 0; z-index: 5000; background: rgba(0,0,0,0.95);
+            display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center;
+        }
+        .boss-avatar { font-size: 80px; filter: drop-shadow(0 0 20px var(--legendary)); margin-bottom: 20px; }
 
         /* APP UI */
         #app { display: none; height: 100vh; flex-direction: column; }
         header { padding: 15px 20px; background: #000; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
         #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .bubble { max-width: 80%; padding: 15px; border-radius: 20px; line-height: 1.4; animation: pop 0.4s; }
+        .msg { max-width: 80%; padding: 15px; border-radius: 20px; animation: pop 0.3s; }
         .bot { background: var(--surface); border: 1px solid #333; align-self: flex-start; }
         .user { background: var(--gold); color: #000; align-self: flex-end; font-weight: 900; }
 
@@ -41,62 +53,57 @@
 </head>
 <body>
 
-    <div id="world-map">
-        <h1 style="color:var(--gold); margin-bottom:5px;">WORLD MISSIONS</h1>
-        <p style="color:#666; margin-bottom:30px;">Select your next territory</p>
-
-        <div class="country-card active" onclick="showLuandaMap()">
-            <div style="font-size:40px;">🇦🇴</div>
-            <h2 style="margin:10px 0 5px;">ANGOLA</h2>
-            <p style="font-size:12px; color:var(--accent);">Current Empire: Luanda Districts</p>
+    <div id="boss-overlay">
+        <div class="boss-avatar">🦁</div>
+        <h1 style="color:var(--legendary);">THE BOSS CHALLENGE</h1>
+        <p id="boss-text">You want to enter Kinshasa? Prove you can handle the market. Translate: "I need a discount on these five shirts."</p>
+        <div class="input-group" style="width: 100%; margin-bottom: 20px;">
+            <input type="text" id="boss-input" placeholder="Type the translation...">
         </div>
-
-        <div class="country-card locked">
-            <div style="font-size:40px;">🇨🇩</div>
-            <h2 style="margin:10px 0 5px;">CONGO KINSHASA</h2>
-            <p style="font-size:12px; color:#888;">Unlocks at Rank #10</p>
-        </div>
-
-        <div id="chest-zone" onclick="openChest()">
-            <div id="chest-icon" style="font-size:30px;">🎁</div>
-            <div style="font-size:10px; font-weight:bold; color:var(--gold);">DAILY BOSS CHEST</div>
-        </div>
+        <button onclick="checkBossChallenge()" style="background:var(--gold); border:none; padding:15px 40px; border-radius:15px; font-weight:900;">NEGOTIATE</button>
+        <button onclick="document.getElementById('boss-overlay').style.display='none'" style="background:transparent; color:#666; border:none; margin-top:20px;">I'M NOT READY</button>
     </div>
 
     <div id="map-screen">
-        <header>
-            <button onclick="exitToWorld()" style="background:transparent; border:none; color:white;">⬅ WORLD</button>
-            <div style="font-weight: 900; color: var(--gold);">💰 <span id="map-coins">5000</span> Kz</div>
-        </header>
-        <h2 style="margin:20px 0;">LUANDA DISTRICTS</h2>
-        <div id="district-list">
-            <div class="district-card" onclick="startApp('Ilha do Cabo')">
-                <span>1. Ilha do Cabo</span>
-                <span class="stars">★★★</span>
+        <div id="property-bar">
+            <span>🏠 KILAMBA T3: +50 Kz/hr</span>
+            <span>🏢 BAI OFFICE: +200 Kz/hr</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <h1 style="color:var(--gold); margin:0;">EXPLORER MODE</h1>
+            <div style="font-weight:900;">💰 <span id="map-coins">5000</span></div>
+        </div>
+        <div id="district-list" style="margin-top:20px;">
+            <div class="district-card">
+                <div><b>Ilha do Cabo</b><br><small>Level 1-7 (Completed)</small></div>
+                <button class="unlock-btn" onclick="startApp('Ilha')">ENTER</button>
             </div>
-            <div class="district-card" onclick="startApp('Ingombota')">
-                <span>2. Ingombota</span>
-                <span class="stars">★★☆</span>
+            <div class="district-card locked">
+                <div><b>Congo Kinshasa</b><br><small>Requires Boss Approval</small></div>
+                <button class="unlock-btn" onclick="openBoss('Kinshasa')">CHALLENGE</button>
             </div>
-            <div class="district-card" onclick="startApp('Kilamba')">
-                <span>3. Kilamba City</span>
-                <span class="stars">☆☆☆</span>
+            <div class="district-card locked">
+                <div><b>Lisbon Missions</b><br><small>Rank #5 Required</small></div>
+                <div class="lock-icon">🔒</div>
             </div>
         </div>
     </div>
 
     <div id="app">
         <header>
-            <button onclick="backToMap()" style="background:transparent; border:none; color:white;">🗺️</button>
+            <button onclick="exitToMap()" style="background:transparent; border:none; color:white;">🗺️</button>
             <div style="font-weight: 900; color: var(--gold);">💰 <span id="app-coins">5000</span> Kz</div>
-            <div id="lesson-tag" style="font-size:10px; color:var(--accent);">LUANDA</div>
+            <div style="color:var(--accent); font-weight:800; font-size:11px;">ACTIVE MISSION</div>
         </header>
         <div id="chat">
-            <div class="bubble bot"><b>Mestre:</b> 🦌<br>District Loaded. Ready to earn more Kwanza, Boss?</div>
+            <div class="msg bot" id="bot-q">
+                <b>Mestre:</b> 🦌<br>
+                Welcome back. To earn your Kwanza, answer this: <b>"How do you ask for the bill at the beach?"</b>
+            </div>
         </div>
         <div class="builder">
             <div class="input-group">
-                <input type="text" id="words-in" placeholder="Select phrases to start...">
+                <input type="text" id="words-in" placeholder="Translate the answer...">
                 <button onclick="sendMsg()" style="background:var(--gold); border:none; border-radius:50%; width:45px; height:45px; font-weight:bold;">➔</button>
             </div>
         </div>
@@ -104,58 +111,78 @@
 
     <script>
         let coins = 5000;
+        let currentQuestion = "the bill";
+        let activeTarget = "";
 
-        function openChest() {
-            const reward = Math.floor(Math.random() * 1000) + 500;
-            coins += reward;
-            document.getElementById('chest-icon').innerText = "💰";
-            document.getElementById('chest-zone').onclick = null;
-            document.getElementById('chest-zone').style.opacity = "0.5";
-            alert(`BOSS REWARD! You found ${reward} Kz in the chest!`);
-            updateUI();
+        // BOSS LOGIC
+        function openBoss(target) {
+            activeTarget = target;
+            document.getElementById('boss-overlay').style.display = 'flex';
         }
 
-        function showLuandaMap() {
-            document.getElementById('world-map').style.display = 'none';
-            document.getElementById('map-screen').style.display = 'flex';
+        function checkBossChallenge() {
+            const val = document.getElementById('boss-input').value.toLowerCase();
+            // Intelligent check: looking for "discount" and "five shirts"
+            if(val.includes("desconto") && (val.includes("cinco") || val.includes("5"))) {
+                alert("The Boss is impressed. Kinshasa is now UNLOCKED.");
+                coins += 5000;
+                document.getElementById('boss-overlay').style.display = 'none';
+                updateUI();
+            } else {
+                alert("The Boss laughs at your English. Try harder!");
+            }
         }
 
-        function exitToWorld() {
-            document.getElementById('map-screen').style.display = 'none';
-            document.getElementById('world-map').style.display = 'flex';
-        }
-
-        function startApp(district) {
+        // APP LOGIC
+        function startApp(name) {
             document.getElementById('map-screen').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            document.getElementById('lesson-tag').innerText = district.toUpperCase();
+            askNewQuestion();
         }
 
-        function backToMap() {
-            document.getElementById('app').style.display = 'none';
-            document.getElementById('map-screen').style.display = 'flex';
+        function askNewQuestion() {
+            const questions = [
+                { q: "How do you say 'Turn left' to a taxi driver?", a: "esquerda" },
+                { q: "Ask for 'Cold Water' at the market.", a: "água fria" },
+                { q: "Tell the waiter 'The fish is delicious'.", a: "peixe" }
+            ];
+            const pick = questions[Math.floor(Math.random() * questions.length)];
+            document.getElementById('bot-q').innerHTML = `<b>Mestre:</b> 🦌<br>${pick.q}`;
+            currentQuestion = pick.a;
         }
 
         function sendMsg() {
-            const val = document.getElementById('words-in').value;
-            if(!val) return;
+            const val = document.getElementById('words-in').value.toLowerCase();
             const chat = document.getElementById('chat');
-            chat.innerHTML += `<div class="bubble user">${val}</div>`;
-            coins += 200;
+            chat.innerHTML += `<div class="msg user">${val}</div>`;
+            
+            if(val.includes(currentQuestion)) {
+                coins += 300;
+                chat.innerHTML += `<div class="msg bot"><b>Correct!</b> +300 Kz. Your English is becoming sharp.</div>`;
+                setTimeout(askNewQuestion, 1500);
+            } else {
+                chat.innerHTML += `<div class="msg bot" style="border-color:var(--danger)"><b>Wrong!</b> That's not how a Boss speaks. Try again.</div>`;
+            }
             updateUI();
-            setTimeout(() => {
-                chat.innerHTML += `<div class="bubble bot"><b>Mestre:</b><br>Sentence processed. Keep going!</div>`;
-                chat.scrollTop = chat.scrollHeight;
-            }, 600);
+            chat.scrollTop = chat.scrollHeight;
             document.getElementById('words-in').value = "";
         }
+
+        // REAL ESTATE PASSIVE INCOME (Simulated every 10 seconds)
+        setInterval(() => {
+            coins += 10;
+            updateUI();
+        }, 10000);
 
         function updateUI() {
             document.getElementById('map-coins').innerText = coins;
             document.getElementById('app-coins').innerText = coins;
         }
 
-        updateUI();
+        function exitToMap() {
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('map-screen').style.display = 'flex';
+        }
     </script>
 </body>
 </html>
