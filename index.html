@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestre AI - Cinematic Elite</title>
+    <title>Mestre AI - Elite Academy</title>
     <style>
         :root { --gold: #ffd700; --dark: #050505; --accent: #00ffcc; --red: #ff4444; }
         * { box-sizing: border-box; font-family: sans-serif; transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         body { background: var(--dark); color: white; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* INTRO */
-        #intro-overlay { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .progress-bar { width: 200px; height: 2px; background: #222; margin-top: 40px; position: relative; }
-        #p-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--gold); width: 0%; transition: width 4s linear; }
-
         /* SCREENS */
         #home-menu, #battle-screen, #class-screen { display: none; height: 100vh; flex-direction: column; padding: 30px 20px; text-align: center; position: fixed; inset: 0; overflow-y: auto; }
-        #home-menu { background: radial-gradient(circle at top right, #1a1a00, #000); }
+        #home-menu { background: radial-gradient(circle at top right, #1a1a00, #000); display: flex; }
         #battle-screen, #class-screen { background: #000; z-index: 100; }
 
         .boss-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 25px; padding: 20px; margin-top: 15px; text-align: left; }
@@ -25,23 +20,18 @@
         .menu-btn { width: 100%; padding: 18px; margin-top: 10px; border-radius: 15px; border: none; font-weight: 900; font-size: 16px; cursor: pointer; }
         .btn-gold { background: var(--gold); color: black; }
         .btn-dark { background: #111; color: white; border: 1px solid #333; }
-        .btn-voice { background: var(--accent); color: black; padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 12px; }
+        .btn-voice { background: var(--accent); color: black; padding: 8px 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 11px; margin-left: 5px; }
+        .btn-rec { background: var(--red); color: white; }
     </style>
 </head>
-<body onload="runIntro()">
-
-    <div id="intro-overlay">
-        <div style="color:var(--gold); letter-spacing:8px;">ELITE ACADEMY</div>
-        <div id="loader-word" style="font-size:35px; font-weight:900; margin-top:20px;">POWER</div>
-        <div class="progress-bar"><div id="p-fill"></div></div>
-    </div>
+<body>
 
     <div id="home-menu">
         <div style="font-size: 12px; color: var(--accent); font-weight: 800;">ANGOLA ELITE</div>
         <h1 style="font-size: 38px; margin: 5px 0;">MESTRE <span style="color:var(--gold)">AI</span></h1>
         <div class="boss-card" style="text-align: center;">
-            <div id="mascot-view" style="font-size: 45px;">⚪🦁</div>
-            <p id="stats-display" style="font-size: 13px; color: #888;">Syncing...</p>
+            <div style="font-size: 45px;">⚪🦁</div>
+            <p id="stats-display" style="font-size: 13px; color: #888;">Level 1 | 5400 Kz</p>
             <button class="menu-btn btn-gold" onclick="enterMap()">START MISSION</button>
             <button class="menu-btn btn-dark" onclick="openClass()" style="color:var(--accent); border-color:var(--accent);">TRAINING CENTER 📚</button>
             <button class="menu-btn btn-dark" onclick="openShop()">THE PALANCA SHOP</button>
@@ -50,7 +40,6 @@
 
     <div id="class-screen">
         <h2 style="color:var(--accent);">TRAINING CENTER</h2>
-        <p style="font-size:12px; color:#666; margin-bottom:20px;">Listen to how we use these words in real life.</p>
         <div id="study-list"></div>
         <button class="menu-btn btn-gold" onclick="exitToMenu()" style="margin-top:20px;">READY FOR BATTLE</button>
     </div>
@@ -60,47 +49,29 @@
         <div id="health-display" style="font-size:22px; margin:10px 0;">❤️❤️❤️</div>
         <div class="boss-card" style="text-align: center;">
             <h2 id="question-text" style="font-size:26px;">Red</h2>
-            <input type="text" id="answer-input" placeholder="Type translation..." autocomplete="off">
+            <input type="text" id="answer-input" placeholder="Tradução..." autocomplete="off">
             <button class="menu-btn btn-gold" onclick="checkAnswer()">COMMIT ANSWER</button>
-            <button class="menu-btn btn-dark" onclick="getHint()" style="font-size:12px;">HINT (100 Kz)</button>
         </div>
         <button class="menu-btn btn-dark" onclick="exitToMenu()" style="margin-top:20px; opacity:0.5;">ABORT</button>
     </div>
 
     <script>
-        const bossWords = ["SPEAK", "LEARN", "MASTER", "ELITE"];
         let userStats = { level: 1, stars: 0, kwanza: 5400, health: 3, mistakes: [] };
+        let mediaRecorder;
+        let audioChunks = [];
 
         const missions = [
-            { q: "Red", a: "Vermelho", s: "The traffic light is red." },
-            { q: "Blue", a: "Azul", s: "The sky in Luanda is blue." },
-            { q: "Market", a: "Mercado", s: "I am going to the market." },
-            { q: "BOSS: Yellow", a: "Amarelo", s: "The sun is bright yellow." },
-            { q: "Settings", a: "Definições", s: "Open the phone settings." },
-            { q: "Password", a: "Palavra-passe", s: "Do not share your password." },
-            { q: "Security", a: "Segurança", s: "Privacy and security are key." },
-            { q: "BOSS: System", a: "Sistema", s: "Update the system now." },
-            { q: "Change", a: "Alterar", s: "I need to change my email." },
-            { q: "Verify", a: "Verificar", s: "Verify your account info." },
-            { q: "FINAL BOSS: Albino Lion", a: "Leão Albino", s: "The Albino Lion is the King." }
+            { q: "Red", a: "Vermelho", s: "The traffic light is red.", pt_s: "O semáforo está vermelho." },
+            { q: "Blue", a: "Azul", s: "The sky is blue.", pt_s: "O céu está azul." },
+            { q: "Market", a: "Mercado", s: "Go to the market.", pt_s: "Vai ao mercado." },
+            { q: "BOSS: Yellow", a: "Amarelo", s: "The sun is yellow.", pt_s: "O sol é amarelo." },
+            { q: "Settings", a: "Definições", s: "Open settings.", pt_s: "Abrir definições." },
+            { q: "Password", a: "Palavra-passe", s: "Secret password.", pt_s: "Palavra-passe secreta." },
+            { q: "FINAL BOSS: Albino Lion", a: "Leão Albino", s: "The Lion is King.", pt_s: "O Leão é o Rei." }
         ];
 
-        function runIntro() {
-            let wordIdx = 0;
-            setInterval(() => {
-                document.getElementById('loader-word').innerText = bossWords[wordIdx];
-                wordIdx = (wordIdx + 1) % bossWords.length;
-            }, 800);
-            setTimeout(() => document.getElementById('p-fill').style.width = "100%", 100);
-            setTimeout(() => {
-                document.getElementById('intro-overlay').style.display = "none";
-                document.getElementById('home-menu').style.display = "flex";
-                updateUI();
-            }, 4000);
-        }
-
         function updateUI() {
-            document.getElementById('stats-display').innerHTML = `Level: ${userStats.level}/11 | ${userStats.kwanza} Kz | ⭐ ${userStats.stars}`;
+            document.getElementById('stats-display').innerHTML = `Level: ${userStats.level}/7 | ${userStats.kwanza} Kz`;
         }
 
         function openClass() {
@@ -109,20 +80,21 @@
             const list = document.getElementById('study-list');
             list.innerHTML = "";
             
-            // Show current level + next one
             missions.slice(userStats.level - 1, userStats.level + 1).forEach(item => {
-                let hasError = userStats.mistakes.includes(item.q) ? "⚠️ Need Practice!" : "";
                 let card = document.createElement('div');
                 card.className = 'boss-card';
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>${item.q} <span style="color:var(--red); font-size:10px;">${hasError}</span></b>
-                        <button class="btn-voice" onclick="speak('${item.q}')">🔊 Hear Word</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <b>${item.q} <span style="color:#888;">(${item.a})</span></b>
+                        <div>
+                            <button class="btn-voice" onclick="speak('${item.q}')">🔊</button>
+                            <button class="btn-voice btn-rec" onclick="toggleRec(this)">🎙️ Rec</button>
+                        </div>
                     </div>
-                    <div style="color:#888; font-size:13px; margin:10px 0;">PT: ${item.a}</div>
-                    <div style="background:#111; padding:10px; border-radius:10px; font-size:12px; border-left:3px solid var(--gold);">
-                        <i>"${item.s}"</i>
-                        <button onclick="speak('${item.s}')" style="background:none; border:none; color:var(--accent); font-size:10px; cursor:pointer;">[Listen Sentence]</button>
+                    <div style="background:#111; padding:12px; border-radius:10px; font-size:12px; margin-top:10px; border-left:3px solid var(--gold);">
+                        <div style="color:var(--gold); font-weight:bold;">${item.s}</div>
+                        <div style="color:#666; margin-top:4px;">PT: ${item.pt_s}</div>
+                        <button onclick="speak('${item.s}')" style="background:none; border:none; color:var(--accent); font-size:10px; padding:0; margin-top:5px; cursor:pointer;">[Listen Sentence]</button>
                     </div>`;
                 list.appendChild(card);
             });
@@ -131,13 +103,30 @@
         function speak(text) {
             window.speechSynthesis.cancel();
             let m = new SpeechSynthesisUtterance(text);
-            m.lang = 'en-US';
-            m.rate = 0.8;
+            m.lang = 'en-US'; m.rate = 0.8;
             window.speechSynthesis.speak(m);
         }
 
+        async function toggleRec(btn) {
+            if (!mediaRecorder || mediaRecorder.state === "inactive") {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    new Audio(audioUrl).play();
+                };
+                mediaRecorder.start();
+                btn.innerText = "🛑 Stop";
+            } else {
+                mediaRecorder.stop();
+                btn.innerText = "🎙️ Rec";
+            }
+        }
+
         function enterMap() {
-            if(userStats.level > 11) return alert("You are the Albino King! All levels done.");
             document.getElementById('home-menu').style.display = "none";
             document.getElementById('battle-screen').style.display = "flex";
             let cur = missions[userStats.level-1];
@@ -151,19 +140,12 @@
             let input = document.getElementById('answer-input').value.trim().toLowerCase();
             let cur = missions[userStats.level-1];
             if(input === cur.a.toLowerCase()) {
-                alert("ELITE WORK! +1200 Kz");
-                userStats.kwanza += 1200; userStats.stars += 3; userStats.level++;
-                // Remove from mistakes if corrected
-                userStats.mistakes = userStats.mistakes.filter(m => m !== cur.q);
-                exitToMenu();
+                alert("CORRECT!");
+                userStats.level++; exitToMenu();
             } else {
-                userStats.health--; 
-                if(!userStats.mistakes.includes(cur.q)) userStats.mistakes.push(cur.q);
-                updateHealthUI();
-                if(userStats.health <= 0) { 
-                    alert("FAILED. Go to Training to hear the sentences."); 
-                    userStats.health = 3; exitToMenu(); 
-                } else alert("WRONG! Pay attention to the spelling.");
+                userStats.health--; updateHealthUI();
+                if(userStats.health <= 0) { alert("FAIL! Go study."); userStats.health = 3; exitToMenu(); }
+                else alert("WRONG!");
             }
         }
 
@@ -179,14 +161,7 @@
             updateUI();
         }
 
-        function openShop() { alert(`SHOP:\nElephant: 2k Kz\nAlbino Lion: 250k Kz\n\nKwanza: ${userStats.kwanza}`); }
-        function getHint() {
-            if(userStats.kwanza < 100) return alert("No Kwanza!");
-            userStats.kwanza -= 100;
-            let a = missions[userStats.level-1].a;
-            alert(`Hint: ${a[0]}...${a[a.length-1]}`);
-            updateUI();
-        }
+        function openShop() { alert("Shop: Coming Soon."); }
     </script>
 </body>
 </html>
