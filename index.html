@@ -1,79 +1,63 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola English Teacher</title>
-    <style>
-        body { background: #121212; color: white; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
-        #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; }
-        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; }
-        .user { color: #ffffff; margin-bottom: 15px; text-align: right; font-weight: bold; }
-        .input-box { display: flex; gap: 5px; }
-        input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; }
-        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; }
-    </style>
-</head>
-<body>
+<script>
+    // Expanded 50 Core Words (English to Portuguese)
+    const dicionario = {
+        "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
+        "a": "um/uma", "in": "em", "that": "que", "have": "ter", "i": "eu",
+        "it": "isto", "for": "por", "not": "não", "on": "em/sobre", "with": "com",
+        "he": "ele", "as": "como", "you": "você", "do": "fazer", "at": "em",
+        "this": "este", "but": "mas", "his": "dele", "by": "por", "from": "de",
+        "they": "eles", "we": "nós", "say": "dizer", "her": "dela", "she": "ela",
+        "or": "ou", "an": "um/uma", "will": "será", "my": "meu", "one": "um",
+        "all": "tudo", "would": "seria", "there": "lá", "their": "deles", "what": "o que",
+        "so": "então", "up": "cima", "out": "fora", "if": "se", "about": "sobre",
+        "who": "quem", "get": "pegar", "which": "qual", "go": "ir", "me": "me/mim"
+    };
 
-    <h3 style="text-align:center; color:#ffd700; margin: 5px;">Mestre de Inglês 🇦🇴🇺🇸</h3>
-    
-    <div id="chat">
-        <div class="bot">Bot: Hello! I am your American teacher. Escreva algo em Inglês para começar!</div>
-    </div>
+    function falar() {
+        var campo = document.getElementById("words");
+        var tela = document.getElementById("chat");
+        var texto = campo.value.trim().toLowerCase();
 
-    <div class="input-box">
-        <input type="text" id="words" placeholder="Escreva aqui...">
-        <button onclick="falar()">SEND</button>
-    </div>
+        if (texto === "") return;
 
-    <script>
-        const dicionario = {
-            "i": "Eu", "have": "Tenho/Ter", "the": "O/A", "be": "Ser/Estar", "to": "Para",
-            "and": "E", "a": "Um/Uma", "in": "Em", "you": "Você/Tu", "do": "Fazer",
-            "with": "Com", "not": "Não", "is": "É", "my": "Meu/Minha", "we": "Nós"
-        };
+        // User side
+        tela.innerHTML += "<div class='user'>Tu: " + texto + "</div>";
 
-        function falar() {
-            var campo = document.getElementById("words");
-            var tela = document.getElementById("chat");
-            var texto = campo.value.trim().toLowerCase();
+        // Teacher Logic
+        var lista = texto.split(/\s+/);
+        var encontrados = [];
+        lista.forEach(function(p) {
+            if (dicionario[p]) encontrados.push(p.toUpperCase() + " (" + dicionario[p] + ")");
+        });
 
-            if (texto === "") return;
+        var resposta = encontrados.length > 0 
+            ? "Excellent! You used: " + encontrados.join(", ") 
+            : "I see! Try to use 'I', 'have', or 'you'. For example: 'I have a book'.";
 
-            // Mostra o que você escreveu
-            tela.innerHTML += "<div class='user'>Tu: " + texto + "</div>";
+        // Bot side
+        tela.innerHTML += "<div class='bot'>Teacher: " + resposta + "</div>";
 
-            // Lógica do Professor
-            var lista = texto.split(" ");
-            var encontrados = [];
-            
-            lista.forEach(function(palavra) {
-                if (dicionario[palavra]) {
-                    encontrados.push(palavra.toUpperCase() + " (" + dicionario[palavra] + ")");
-                }
-            });
-
-            var resposta = "";
-            if (encontrados.length > 0) {
-                resposta = "Very good! Você usou: " + encontrados.join(", ");
-            } else {
-                resposta = "I understand. Tente usar palavras como 'I', 'have' ou 'is'.";
-            }
-
-            // Mostra a resposta do Bot
-            tela.innerHTML += "<div class='bot'>Teacher: " + resposta + "</div>";
-
-            // Faz o Bot falar (Voz Americana)
-            var msg = new SpeechSynthesisUtterance(resposta);
-            msg.lang = 'en-US';
-            msg.rate = 0.8;
-            window.speechSynthesis.speak(msg);
-
-            // Limpa e desce a tela
-            campo.value = "";
-            tela.scrollTop = tela.scrollHeight;
+        // --- THE NEW VOICE LOGIC ---
+        window.speechSynthesis.cancel(); // Clear any old speech
+        var msg = new SpeechSynthesisUtterance(resposta);
+        
+        // Find American Voice
+        var voices = window.speechSynthesis.getVoices();
+        var american = voices.find(v => v.lang.includes('en-US'));
+        
+        if (american) {
+            msg.voice = american;
         }
-    </script>
-</body>
-</html>
+
+        msg.lang = 'en-US';
+        msg.rate = 0.85; // Natural pace for learning
+        msg.pitch = 1.0; // Normal human pitch
+        msg.volume = 1.0; // Max volume
+
+        window.speechSynthesis.speak(msg);
+
+        // Cleanup
+        campo.value = "";
+        tela.scrollTop = tela.scrollHeight;
+    }
+</script>
