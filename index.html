@@ -1,20 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Angola English Teacher</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #0b141a; margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; overflow: hidden; }
+        .stats { background: #202c33; padding: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; font-size: 0.8rem; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 100px; }
+        .m { max-width: 85%; padding: 12px; border-radius: 15px; line-height: 1.4; animation: fadeIn 0.2s; }
+        .bot { background: #202c33; align-self: flex-start; border-top-left-radius: 0; border-left: 3px solid #d81e05; }
+        .user { background: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
+        .input-area { position: fixed; bottom: 0; width: 100%; background: #202c33; padding: 15px; display: flex; gap: 10px; box-sizing: border-box; }
+        input { flex: 1; background: #2a3942; border: none; padding: 15px; border-radius: 25px; color: white; font-size: 16px; outline: none; }
+        button { background: #f8d800; border: none; width: 50px; height: 50px; border-radius: 50%; color: black; font-weight: bold; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="stats">
+    <span>Lvl 1 Teacher 🇦🇴</span>
+    <span id="xp-tag">0 XP</span>
+</div>
+
+<div id="chat-box">
+    <div class="m bot"><b>System Reset!</b> The bot is stable. Type 'Ola' or 'Help' to test. Send me your <b>Verb to Be</b> lesson now!</div>
+</div>
+
+<div class="input-area">
+    <input type="text" id="in" placeholder="Type here..." onkeypress="if(event.key==='Enter') send()">
+    <button onclick="send()">></button>
+</div>
+
 <script>
     let xp = 0;
-    // 100 MOST COMMON WORDS - Optimized
-    const dictionary = [
-        { pt: "o", en: "The" }, { pt: "a", en: "The" }, { pt: "ser", en: "Be" }, { pt: "para", en: "To" }, { pt: "de", en: "Of" }, 
-        { pt: "e", en: "And" }, { pt: "um", en: "A" }, { pt: "em", en: "In" }, { pt: "ter", en: "Have" }, { pt: "eu", en: "I" },
-        { pt: "isso", en: "It" }, { pt: "nao", en: "No / Not" }, { pt: "com", en: "With" }, { pt: "ele", en: "He" }, { pt: "ela", en: "She" }, 
-        { pt: "voce", en: "You" }, { pt: "fazer", en: "Do" }, { pt: "este", en: "This" }, { pt: "mas", en: "But" }, { pt: "eles", en: "They" }, 
-        { pt: "nos", en: "We" }, { pt: "dizer", en: "Say" }, { pt: "ir", en: "Go" }, { pt: "obter", en: "Get" }, { pt: "meu", en: "My" }, 
-        { pt: "ver", en: "See" }, { pt: "saber", en: "Know" }, { pt: "tempo", en: "Time" }, { pt: "quem", en: "Who" }, { pt: "dar", en: "Give" },
-        { pt: "quando", en: "When" }, { pt: "onde", en: "Where" }, { pt: "porque", en: "Why" }, { pt: "como", en: "How" }, { pt: "ajuda", en: "Help" }, 
-        { pt: "obrigado", en: "Thank you" }, { pt: "por favor", en: "Please" }, { pt: "estamos juntos", en: "We are together" },
-        { pt: "bom dia", en: "Good morning" }, { pt: "boa noite", en: "Good night" }, { pt: "fome", en: "Hungry" }, { pt: "sede", en: "Thirsty" },
-        { pt: "feliz", en: "Happy" }, { pt: "triste", en: "Sad" }, { pt: "escola", en: "School" }, { pt: "trabalho", en: "Work" }, 
-        { pt: "casa", en: "Home" }, { pt: "familia", en: "Family" }, { pt: "amigo", en: "Friend" }, { pt: "ola", en: "Hello" },
-        { pt: "hi", en: "Hi!" }, { pt: "mambo", en: "Thing / Situation" }
-    ];
+
+    // Simplified dictionary to prevent "White Screen"
+    const dictionary = {
+        "ola": "Hello!",
+        "bom dia": "Good morning",
+        "obrigado": "Thank you",
+        "fome": "Hungry",
+        "estamos juntos": "We are together",
+        "ajuda": "Help",
+        "sim": "Yes",
+        "nao": "No",
+        "por favor": "Please",
+        "mambo": "Thing / Situation"
+    };
 
     function send() {
         let input = document.getElementById('in');
@@ -25,32 +59,34 @@
         input.value = "";
 
         setTimeout(() => {
-            // FIXED SEARCH: Looks for the exact word match
-            let found = dictionary.find(d => d.pt === val || d.en.toLowerCase() === val);
+            let response = dictionary[val];
 
-            if(found) {
-                addMsg("🇺🇸 <b>" + found.en + "</b>", 'bot');
-                speak(found.en);
+            if(response) {
+                addMsg("🇺🇸 <b>" + response + "</b>", 'bot');
+                speak(response);
                 xp += 10;
                 document.getElementById('xp-tag').innerText = xp + " XP";
-            } else if (val.includes("aula") || val.includes("lesson")) {
-                addMsg("👨‍🏫 <b>Class Alert!</b> My master is about to teach me the Verb to Be. Stay tuned!", 'bot');
             } else {
-                addMsg("I don't know that word yet, brother! Try 'Ola', 'Fome', or 'Obrigado'.", 'bot');
+                addMsg("I'm ready for the lesson! Send me the Verb to Be text.", 'bot');
             }
         }, 500);
     }
 
     function addMsg(t, s) {
         let d = document.createElement('div');
-        d.className = 'm ' + s; d.innerHTML = t;
+        d.className = 'm ' + s;
+        d.innerHTML = t;
         let box = document.getElementById('chat-box');
-        box.appendChild(d); box.scrollTop = box.scrollHeight;
+        box.appendChild(d);
+        box.scrollTop = box.scrollHeight;
     }
 
     function speak(t) {
         let s = new SpeechSynthesisUtterance(t);
-        s.lang = 'en-US'; s.rate = 0.8;
+        s.lang = 'en-US';
         window.speechSynthesis.speak(s);
     }
 </script>
+
+</body>
+</html>
