@@ -1,69 +1,62 @@
-<!DOCTYPE html>
-<html lang="pt-ao">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angola English AI</title>
-    <style>
-        body { background: #121212; color: white; font-family: sans-serif; padding: 20px; }
-        #chat-container { border: 2px solid #ffd700; padding: 15px; border-radius: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
-        input { width: 70%; padding: 10px; border-radius: 5px; border: none; }
-        button { width: 25%; padding: 10px; background: #ffd700; border: none; font-weight: bold; border-radius: 5px; }
-        .bot-msg { color: #00ffcc; margin: 5px 0; }
-        .user-msg { color: #ffffff; margin: 5px 0; font-weight: bold; }
-    </style>
-</head>
-<body>
+<script>
+    // Our Core 50 Dictionary (English to Portuguese)
+    const dictionary = {
+        "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
+        "have": "ter", "i": "eu", "it": "isto", "for": "por", "you": "você",
+        "with": "com", "on": "em", "do": "fazer", "say": "dizer", "this": "este"
+    };
 
-    <h2>Teacher "Aula" 🇦🇴🇬🇧</h2>
-    <div id="chat-container">
-        <div class="bot-msg">Teacher: Olá! Escreve uma frase em Inglês para começar.</div>
-    </div>
-
-    <input type="text" id="userInput" placeholder="Escreva aqui...">
-    <button onclick="sendMessage()">SEND</button>
-
-    <script>
-        // Our Core 50 Dictionary
-        const dictionary = {
-            "the": "o/a", "be": "ser/estar", "to": "para", "of": "de", "and": "e",
-            "have": "ter", "i": "eu", "it": "isto", "for": "por", "you": "você"
-            // We will add the rest as we go!
-        };
-
-        function sendMessage() {
-            const input = document.getElementById("userInput");
-            const container = document.getElementById("chat-container");
-            const text = input.value.trim().toLowerCase();
-
-            if (text === "") return;
-
-            // Show User Message
-            container.innerHTML += `<div class="user-msg">Tu: ${text}</div>`;
-
-            // AI Logic: Check for words
-            let response = "Teacher: Nice! ";
-            let foundWords = [];
-
-            for (let word in dictionary) {
-                if (text.includes(word)) {
-                    foundWords.push(`${word} (${dictionary[word]})`);
-                }
-            }
-
-            if (foundWords.length > 0) {
-                response += "Usaste estas palavras: " + foundWords.join(", ");
-            } else {
-                response = "Teacher: Tenta usar palavras simples como 'I', 'Have' ou 'The'.";
-            }
-
-            // Show Bot Response
-            container.innerHTML += `<div class="bot-msg">${response}</div>`;
-            
-            // Auto-scroll and clear
-            input.value = "";
-            container.scrollTop = container.scrollHeight;
+    // Function to make the Bot Speak with an American accent
+    function speak(text) {
+        const message = new SpeechSynthesisUtterance();
+        message.text = text;
+        
+        // Find an American English voice
+        const voices = window.speechSynthesis.getVoices();
+        const americanVoice = voices.find(voice => voice.lang === 'en-US');
+        
+        if (americanVoice) {
+            message.voice = americanVoice;
         }
-    </script>
-</body>
-</html>
+        
+        message.rate = 0.9; // Slightly slower so it's easier to learn
+        message.pitch = 1.0;
+        window.speechSynthesis.speak(message);
+    }
+
+    function sendMessage() {
+        const input = document.getElementById("userInput");
+        const container = document.getElementById("chat-container");
+        const text = input.value.trim().toLowerCase();
+
+        if (text === "") return;
+
+        // Show User Message
+        container.innerHTML += `<div class="user-msg">Tu: ${text}</div>`;
+
+        // AI Logic: Check for words
+        let foundWords = [];
+        for (let word in dictionary) {
+            if (text.split(/\s+/).includes(word)) {
+                foundWords.push(`${word} (${dictionary[word]})`);
+            }
+        }
+
+        let responseText = "";
+        if (foundWords.length > 0) {
+            responseText = "Great! You used: " + foundWords.join(", ");
+        } else {
+            responseText = "Try using common words like 'I' or 'have'.";
+        }
+
+        // Show Bot Response in UI
+        container.innerHTML += `<div class="bot-msg">Teacher: ${responseText}</div>`;
+        
+        // MAKE THE BOT TALK
+        speak(responseText);
+
+        // Auto-scroll and clear
+        input.value = "";
+        container.scrollTop = container.scrollHeight;
+    }
+</script>
