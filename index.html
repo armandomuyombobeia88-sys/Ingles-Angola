@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Angola Teacher AI</title>
+    <title>Mestre AI Angola</title>
     <style>
         body { background: #121212; color: white; font-family: sans-serif; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
-        #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; box-shadow: inset 0 0 10px #000; }
-        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; border-left: 3px solid #ffd700; padding-left: 10px; animation: fadeIn 0.5s; }
+        #chat { flex-grow: 1; border: 2px solid #ffd700; border-radius: 10px; padding: 10px; overflow-y: auto; background: #1e1e1e; margin-bottom: 10px; }
+        .bot { color: #00ffcc; margin-bottom: 15px; font-size: 16px; border-left: 3px solid #ffd700; padding-left: 10px; }
         .user { color: #ffffff; margin-bottom: 15px; text-align: right; font-weight: bold; }
         .controls { display: flex; gap: 5px; padding-bottom: 10px; }
         input { flex: 1; padding: 15px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; outline: none; }
-        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; min-width: 70px; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        button { padding: 15px; background: #ffd700; border: none; border-radius: 8px; font-weight: bold; color: black; }
     </style>
 </head>
 <body>
@@ -20,7 +19,7 @@
     <h3 style="text-align:center; color:#ffd700; margin: 5px;">Mestre AI 🇦🇴🇬🇧</h3>
     
     <div id="chat">
-        <div class="bot"><b>Teacher:</b> Hello! I am your American teacher. How are you? <br><small>(Olá! Eu sou o seu professor Americano. Como está?)</small></div>
+        <div class="bot"><b>Teacher:</b> Hello! I am ready. Type 'Lesson 1' or ask me a word like 'Carro' or 'Work'!</div>
     </div>
 
     <div class="controls">
@@ -29,6 +28,19 @@
     </div>
 
     <script>
+        // --- THE BIG LIBRARY ---
+        // You can add 1000s of words here in the same format
+        var biblioteca = {
+            "hello": "Olá", "hi": "Oi", "ok": "Está bem / Ok", "yes": "Sim", "no": "Não",
+            "thanks": "Obrigado", "teacher": "Professor", "student": "Aluno",
+            "work": "Trabalhar", "eat": "Comer", "sleep": "Dormir", "drink": "Beber",
+            "run": "Correr", "walk": "Andar", "speak": "Falar", "learn": "Aprender",
+            "book": "Livro", "car": "Carro", "water": "Água", "friend": "Amigo",
+            "house": "Casa", "family": "Família", "school": "Escola", "money": "Dinheiro",
+            "i am": "Eu sou / Eu estou", "i have": "Eu tenho", "you are": "Você é",
+            "good morning": "Bom dia", "good night": "Boa noite", "please": "Por favor"
+        };
+
         function falar(txt) {
             window.speechSynthesis.cancel();
             var msg = new SpeechSynthesisUtterance(txt);
@@ -40,53 +52,53 @@
             var campo = document.getElementById("words");
             var tela = document.getElementById("chat");
             var inputRaw = campo.value.trim();
-            // This line cleans the text (no dots, no caps) so the AI understands better
             var input = inputRaw.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 
             if (input === "") return;
-
             tela.innerHTML += "<div class='user'>" + inputRaw + "</div>";
 
-            var resEN = ""; 
-            var resPT = "";
+            var resEN = ""; var resPT = ""; var encontrou = false;
 
-            // --- THE AI LESSON BRAIN ---
-            
-            // 1. GREETINGS
-            if (input.includes("hello") || input.includes("hi") || input.includes("ola")) {
-                resEN = "Hello! I am happy to see you. Are you ready for Lesson 1?";
-                resPT = "Olá! Estou feliz por te ver. Estás pronto para a Lição 1?";
-            }
-            // 2. FEELINGS
-            else if (input.includes("how are you") || input.includes("como estas")) {
-                resEN = "I am doing great, thank you! Let's start learning. Type 'Lesson 1'.";
-                resPT = "Estou muito bem, obrigado! Vamos começar a aprender. Escreve 'Lição 1'.";
-            }
-            // 3. LESSON 1: TO BE
-            else if (input.includes("lesson 1") || input.includes("licao 1")) {
-                resEN = "Lesson 1: The Verb 'TO BE'. In English, 'Eu sou' is 'I AM'. Repeat: I am a student.";
-                resPT = "Lição 1: O Verbo 'Ser/Estar'. Em Inglês, 'Eu sou' é 'I AM'. Repete: I am a student.";
-            }
-            // 4. LESSON 2: TO HAVE
-            else if (input.includes("lesson 2") || input.includes("licao 2")) {
-                resEN = "Lesson 2: 'TO HAVE'. To say 'Eu tenho um carro', say 'I HAVE a car'.";
-                resPT = "Lição 2: 'Ter'. Para dizer 'Eu tenho um carro', diz 'I HAVE a car'.";
-            }
-            // 5. ENCOURAGEMENT
-            else if (input.includes("i am") || input.includes("i have")) {
-                resEN = "Excellent! You are speaking English perfectly!";
-                resPT = "Excelente! Estás a falar Inglês perfeitamente!";
-            }
-            // 6. DEFAULT (If the AI doesn't know)
-            else {
-                resEN = "That is interesting! Can you say that using 'I am' or 'I have'? Or type 'Lesson 1'.";
-                resPT = "Isso é interessante! Podes dizer isso usando 'I am' ou 'I have'? Ou escreve 'Lição 1'.";
+            // 1. Check Lessons First
+            if (input.includes("lesson 1") || input.includes("licao 1")) {
+                resEN = "Lesson 1: Greetings. Say 'Hello' or 'Good morning'.";
+                resPT = "Lição 1: Saudações. Diz 'Hello' ou 'Good morning'.";
+                encontrou = true;
+            } 
+            else if (input === "ok") {
+                resEN = "Great! Let's keep going. Type a word to translate.";
+                resPT = "Ótimo! Vamos continuar. Escreve uma palavra para traduzir.";
+                encontrou = true;
             }
 
-            // Display and Speak
+            // 2. Search the Big Library (Automatic English/Portuguese check)
+            if (!encontrou) {
+                // Check if input is English Key
+                if (biblioteca[input]) {
+                    resEN = "The translation of " + input.toUpperCase() + " is " + biblioteca[input];
+                    resPT = "A tradução de " + input.toUpperCase() + " é " + biblioteca[input];
+                    encontrou = true;
+                } else {
+                    // Check if input is Portuguese Value
+                    for (var eng in biblioteca) {
+                        if (biblioteca[eng].toLowerCase().includes(input)) {
+                            resEN = "In English we say: " + eng.toUpperCase();
+                            resPT = "Em Inglês dizemos: " + eng.toUpperCase();
+                            encontrou = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 3. Default if nothing found
+            if (!encontrou) {
+                resEN = "I don't know that word yet, but I am learning!";
+                resPT = "Ainda não conheço essa palavra, mas estou a aprender!";
+            }
+
             tela.innerHTML += "<div class='bot'><b>Teacher:</b> " + resEN + "<br><small>" + resPT + "</small></div>";
             falar(resEN);
-
             campo.value = "";
             tela.scrollTop = tela.scrollHeight;
         }
