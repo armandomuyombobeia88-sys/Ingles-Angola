@@ -19,46 +19,46 @@
         #home-menu { background: radial-gradient(circle at top right, #1a1a00, #000); }
         #battle-screen, #class-screen { background: #000; z-index: 100; }
 
-        .boss-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 25px; padding: 20px; margin-top: 15px; }
+        .boss-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 25px; padding: 20px; margin-top: 15px; text-align: left; }
         input { width: 100%; padding: 18px; background: #111; border: 1px solid #333; color: white; border-radius: 15px; margin: 15px 0; font-size: 18px; text-align: center; outline: none; }
         
         .menu-btn { width: 100%; padding: 18px; margin-top: 10px; border-radius: 15px; border: none; font-weight: 900; font-size: 16px; cursor: pointer; }
         .btn-gold { background: var(--gold); color: black; }
         .btn-dark { background: #111; color: white; border: 1px solid #333; }
-        .btn-voice { background: var(--accent); color: black; padding: 10px; border-radius: 10px; border: none; font-weight: bold; }
+        .btn-voice { background: var(--accent); color: black; padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body onload="runIntro()">
 
     <div id="intro-overlay">
-        <div style="color:var(--gold); letter-spacing:8px;">ELITE SYSTEM</div>
-        <div id="loader-word" style="font-size:35px; font-weight:900; margin-top:20px;">BOSS</div>
+        <div style="color:var(--gold); letter-spacing:8px;">ELITE ACADEMY</div>
+        <div id="loader-word" style="font-size:35px; font-weight:900; margin-top:20px;">POWER</div>
         <div class="progress-bar"><div id="p-fill"></div></div>
     </div>
 
     <div id="home-menu">
         <div style="font-size: 12px; color: var(--accent); font-weight: 800;">ANGOLA ELITE</div>
         <h1 style="font-size: 38px; margin: 5px 0;">MESTRE <span style="color:var(--gold)">AI</span></h1>
-        <div class="boss-card">
-            <div style="font-size: 45px;">⚪🦁</div>
+        <div class="boss-card" style="text-align: center;">
+            <div id="mascot-view" style="font-size: 45px;">⚪🦁</div>
             <p id="stats-display" style="font-size: 13px; color: #888;">Syncing...</p>
             <button class="menu-btn btn-gold" onclick="enterMap()">START MISSION</button>
-            <button class="menu-btn btn-dark" onclick="openClass()" style="color:var(--accent); border-color:var(--accent);">ENTER CLASSROOM 📚</button>
+            <button class="menu-btn btn-dark" onclick="openClass()" style="color:var(--accent); border-color:var(--accent);">TRAINING CENTER 📚</button>
             <button class="menu-btn btn-dark" onclick="openShop()">THE PALANCA SHOP</button>
         </div>
     </div>
 
     <div id="class-screen">
-        <h2 style="color:var(--accent);">STUDY HALL</h2>
-        <p style="font-size:12px; color:#666;">Listen to the English words before the battle.</p>
+        <h2 style="color:var(--accent);">TRAINING CENTER</h2>
+        <p style="font-size:12px; color:#666; margin-bottom:20px;">Listen to how we use these words in real life.</p>
         <div id="study-list"></div>
-        <button class="menu-btn btn-gold" onclick="exitToMenu()" style="margin-top:20px;">BACK TO MENU</button>
+        <button class="menu-btn btn-gold" onclick="exitToMenu()" style="margin-top:20px;">READY FOR BATTLE</button>
     </div>
 
     <div id="battle-screen">
         <div id="battle-header" style="color:var(--gold); font-weight:800;">LEVEL 1</div>
         <div id="health-display" style="font-size:22px; margin:10px 0;">❤️❤️❤️</div>
-        <div class="boss-card">
+        <div class="boss-card" style="text-align: center;">
             <h2 id="question-text" style="font-size:26px;">Red</h2>
             <input type="text" id="answer-input" placeholder="Type translation..." autocomplete="off">
             <button class="menu-btn btn-gold" onclick="checkAnswer()">COMMIT ANSWER</button>
@@ -68,17 +68,21 @@
     </div>
 
     <script>
-        const bossWords = ["POWER", "KNOWLEDGE", "EMPIRE", "FREEDOM"];
-        let userStats = { level: 1, stars: 0, kwanza: 5400, health: 3 };
+        const bossWords = ["SPEAK", "LEARN", "MASTER", "ELITE"];
+        let userStats = { level: 1, stars: 0, kwanza: 5400, health: 3, mistakes: [] };
 
         const missions = [
-            { q: "Red", a: "Vermelho" }, { q: "Blue", a: "Azul" }, { q: "Green", a: "Verde" },
-            { q: "BOSS: Yellow", a: "Amarelo" },
-            { q: "Settings", a: "Definições" }, { q: "Password", a: "Palavra-passe" }, { q: "Privacy", a: "Privacidade" },
-            { q: "BOSS: Security Settings", a: "Definições de segurança" },
-            { q: "Change Password", a: "Alterar palavra-passe" }, { q: "System Update", a: "Atualização do sistema" },
-            { q: "FINAL BOSS: Albino Lion", a: "Leão Albino" },
-            { q: "Success", a: "Sucesso" }, { q: "Elite", a: "Elite" }
+            { q: "Red", a: "Vermelho", s: "The traffic light is red." },
+            { q: "Blue", a: "Azul", s: "The sky in Luanda is blue." },
+            { q: "Market", a: "Mercado", s: "I am going to the market." },
+            { q: "BOSS: Yellow", a: "Amarelo", s: "The sun is bright yellow." },
+            { q: "Settings", a: "Definições", s: "Open the phone settings." },
+            { q: "Password", a: "Palavra-passe", s: "Do not share your password." },
+            { q: "Security", a: "Segurança", s: "Privacy and security are key." },
+            { q: "BOSS: System", a: "Sistema", s: "Update the system now." },
+            { q: "Change", a: "Alterar", s: "I need to change my email." },
+            { q: "Verify", a: "Verificar", s: "Verify your account info." },
+            { q: "FINAL BOSS: Albino Lion", a: "Leão Albino", s: "The Albino Lion is the King." }
         ];
 
         function runIntro() {
@@ -96,25 +100,30 @@
         }
 
         function updateUI() {
-            document.getElementById('stats-display').innerHTML = `Level: ${userStats.level}/13 | ${userStats.kwanza} Kz | ⭐ ${userStats.stars}`;
+            document.getElementById('stats-display').innerHTML = `Level: ${userStats.level}/11 | ${userStats.kwanza} Kz | ⭐ ${userStats.stars}`;
         }
 
-        // --- CLASSROOM LOGIC ---
         function openClass() {
             document.getElementById('home-menu').style.display = "none";
             document.getElementById('class-screen').style.display = "flex";
             const list = document.getElementById('study-list');
             list.innerHTML = "";
             
-            // Show the next 3 words to learn
-            missions.slice(userStats.level - 1, userStats.level + 2).forEach(item => {
+            // Show current level + next one
+            missions.slice(userStats.level - 1, userStats.level + 1).forEach(item => {
+                let hasError = userStats.mistakes.includes(item.q) ? "⚠️ Need Practice!" : "";
                 let card = document.createElement('div');
                 card.className = 'boss-card';
-                card.style.display = "flex";
-                card.style.justifyContent = "space-between";
-                card.style.alignItems = "center";
-                card.innerHTML = `<div><b>${item.q}</b><br><small>${item.a}</small></div>
-                                  <button class="btn-voice" onclick="speak('${item.q}')">🔊 Hear</button>`;
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between;">
+                        <b>${item.q} <span style="color:var(--red); font-size:10px;">${hasError}</span></b>
+                        <button class="btn-voice" onclick="speak('${item.q}')">🔊 Hear Word</button>
+                    </div>
+                    <div style="color:#888; font-size:13px; margin:10px 0;">PT: ${item.a}</div>
+                    <div style="background:#111; padding:10px; border-radius:10px; font-size:12px; border-left:3px solid var(--gold);">
+                        <i>"${item.s}"</i>
+                        <button onclick="speak('${item.s}')" style="background:none; border:none; color:var(--accent); font-size:10px; cursor:pointer;">[Listen Sentence]</button>
+                    </div>`;
                 list.appendChild(card);
             });
         }
@@ -127,12 +136,12 @@
             window.speechSynthesis.speak(m);
         }
 
-        // --- BATTLE LOGIC ---
         function enterMap() {
+            if(userStats.level > 11) return alert("You are the Albino King! All levels done.");
             document.getElementById('home-menu').style.display = "none";
             document.getElementById('battle-screen').style.display = "flex";
             let cur = missions[userStats.level-1];
-            document.getElementById('battle-header').innerText = `LEVEL ${userStats.level}`;
+            document.getElementById('battle-header').innerText = `MISSION ${userStats.level}`;
             document.getElementById('question-text').innerText = cur.q;
             document.getElementById('answer-input').value = "";
             updateHealthUI();
@@ -140,24 +149,22 @@
 
         function checkAnswer() {
             let input = document.getElementById('answer-input').value.trim().toLowerCase();
-            let correct = missions[userStats.level-1].a.toLowerCase();
-            if(input === correct) {
-                alert("EXCELLENT! +1200 Kz");
+            let cur = missions[userStats.level-1];
+            if(input === cur.a.toLowerCase()) {
+                alert("ELITE WORK! +1200 Kz");
                 userStats.kwanza += 1200; userStats.stars += 3; userStats.level++;
+                // Remove from mistakes if corrected
+                userStats.mistakes = userStats.mistakes.filter(m => m !== cur.q);
                 exitToMenu();
             } else {
-                userStats.health--; updateHealthUI();
-                if(userStats.health <= 0) { alert("FAILED! Go to Classroom to study."); userStats.health = 3; exitToMenu(); }
-                else alert("WRONG! -1 Heart");
+                userStats.health--; 
+                if(!userStats.mistakes.includes(cur.q)) userStats.mistakes.push(cur.q);
+                updateHealthUI();
+                if(userStats.health <= 0) { 
+                    alert("FAILED. Go to Training to hear the sentences."); 
+                    userStats.health = 3; exitToMenu(); 
+                } else alert("WRONG! Pay attention to the spelling.");
             }
-        }
-
-        function getHint() {
-            if(userStats.kwanza < 100) return alert("No Kwanza!");
-            userStats.kwanza -= 100;
-            let a = missions[userStats.level-1].a;
-            alert(`Hint: Starts with ${a[0]}... Ends with ${a[a.length-1]}`);
-            updateUI();
         }
 
         function updateHealthUI() {
@@ -173,6 +180,13 @@
         }
 
         function openShop() { alert(`SHOP:\nElephant: 2k Kz\nAlbino Lion: 250k Kz\n\nKwanza: ${userStats.kwanza}`); }
+        function getHint() {
+            if(userStats.kwanza < 100) return alert("No Kwanza!");
+            userStats.kwanza -= 100;
+            let a = missions[userStats.level-1].a;
+            alert(`Hint: ${a[0]}...${a[a.length-1]}`);
+            updateUI();
+        }
     </script>
 </body>
 </html>
